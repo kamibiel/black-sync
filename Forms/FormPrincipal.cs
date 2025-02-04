@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BlackSync.Services;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -60,7 +61,14 @@ namespace BlackSync.Forms
 
         private void CarregarFormularios()
         {
+            string mysqlServer = ConfigService.CarregarConfiguracaoMySQL().servidor;
+            string mysqlDatabase = ConfigService.CarregarConfiguracaoMySQL().banco;
+            string mysqlUser = ConfigService.CarregarConfiguracaoMySQL().usuario;
+            string mysqlPassword = ConfigService.CarregarConfiguracaoMySQL().senha;
+            string firebirdDSN = ConfigService.CarregarConfiguracaoFirebird();
+
             AdicionarFormularioAba(new FormConfig(this), tabConfig);
+            AdicionarFormularioAba(new FormVerificacao(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabVerificacao);
         }
 
         private void AdicionarFormularioAba(Form form, TabPage aba)

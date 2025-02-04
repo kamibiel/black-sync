@@ -34,6 +34,7 @@
             tabVerificacao = new TabPage();
             tabMigracao = new TabPage();
             tabLog = new TabPage();
+            tabEstrutura = new TabPage();
             tabControlPrincipal.SuspendLayout();
             SuspendLayout();
             // 
@@ -42,6 +43,7 @@
             resources.ApplyResources(tabControlPrincipal, "tabControlPrincipal");
             tabControlPrincipal.Controls.Add(tabConfig);
             tabControlPrincipal.Controls.Add(tabVerificacao);
+            tabControlPrincipal.Controls.Add(tabEstrutura);
             tabControlPrincipal.Controls.Add(tabMigracao);
             tabControlPrincipal.Controls.Add(tabLog);
             tabControlPrincipal.Multiline = true;
@@ -76,6 +78,12 @@
             tabLog.BackColor = Color.DimGray;
             tabLog.Name = "tabLog";
             // 
+            // tabEstrutura
+            // 
+            resources.ApplyResources(tabEstrutura, "tabEstrutura");
+            tabEstrutura.Name = "tabEstrutura";
+            tabEstrutura.UseVisualStyleBackColor = true;
+            // 
             // FormPrincipal
             // 
             resources.ApplyResources(this, "$this");
@@ -97,5 +105,6 @@
         private TabPage tabMigracao;
         private TabPage tabLog;
         private TabPage tabVerificacao;
+        private TabPage tabEstrutura;
     }
 }

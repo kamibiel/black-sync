@@ -118,116 +118,143 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="tabMigracao.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Arial Narrow, 11pt</value>
+  <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
+    <value>7, 20</value>
   </data>
-  <data name="tabMigracao.Location" type="System.Drawing.Point, System.Drawing">
-    <value>4, 24</value>
-  </data>
-  <data name="&gt;&gt;tabControlPrincipal.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TabControl, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="tabMigracao.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>3, 4, 3, 4</value>
+  <data name="&gt;&gt;tabConfig.Name" xml:space="preserve">
+    <value>tabConfig</value>
   </data>
   <data name="tabLog.Text" xml:space="preserve">
     <value>Logs</value>
   </data>
-  <data name="&gt;&gt;tabVerificacao.Name" xml:space="preserve">
-    <value>tabVerificacao</value>
+  <data name="tabControlPrincipal.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="$this.StartPosition" type="System.Windows.Forms.FormStartPosition, System.Windows.Forms">
-    <value>CenterScreen</value>
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="tabMigracao.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="tabVerificacao.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>3, 4, 3, 4</value>
+  </data>
+  <data name="&gt;&gt;tabLog.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TabPage, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="$this.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>3, 4, 3, 4</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="tabControlPrincipal.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="&gt;&gt;$this.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Form, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="tabLog.Location" type="System.Drawing.Point, System.Drawing">
+    <value>4, 24</value>
+  </data>
+  <data name="tabMigracao.Size" type="System.Drawing.Size, System.Drawing">
+    <value>809, 532</value>
+  </data>
+  <data name="tabConfig.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>3, 4, 3, 4</value>
+  </data>
+  <data name="tabMigracao.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Arial Narrow, 11pt</value>
+  </data>
+  <data name="&gt;&gt;tabVerificacao.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TabPage, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="tabMigracao.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>3, 4, 3, 4</value>
+  </data>
+  <data name="&gt;&gt;tabControlPrincipal.Name" xml:space="preserve">
+    <value>tabControlPrincipal</value>
+  </data>
+  <data name="tabMigracao.Text" xml:space="preserve">
+    <value>Migração</value>
+  </data>
+  <data name="tabVerificacao.Text" xml:space="preserve">
+    <value>Verificação</value>
+  </data>
+  <data name="tabControlPrincipal.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;tabConfig.Parent" xml:space="preserve">
+    <value>tabControlPrincipal</value>
+  </data>
+  <data name="tabMigracao.Location" type="System.Drawing.Point, System.Drawing">
+    <value>4, 24</value>
+  </data>
+  <data name="tabLog.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="tabControlPrincipal.Size" type="System.Drawing.Size, System.Drawing">
+    <value>817, 560</value>
+  </data>
+  <data name="tabControlPrincipal.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>3, 4, 3, 4</value>
+  </data>
+  <data name="tabEstrutura.Location" type="System.Drawing.Point, System.Drawing">
+    <value>4, 29</value>
+  </data>
+  <data name="&gt;&gt;tabEstrutura.Name" xml:space="preserve">
+    <value>tabEstrutura</value>
+  </data>
+  <data name="tabVerificacao.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Arial Narrow, 11pt</value>
+  </data>
+  <data name="&gt;&gt;tabConfig.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TabPage, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="tabConfig.Size" type="System.Drawing.Size, System.Drawing">
+    <value>809, 527</value>
+  </data>
+  <data name="tabMigracao.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>3, 4, 3, 4</value>
   </data>
   <data name="tabConfig.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
-  <data name="tabVerificacao.Location" type="System.Drawing.Point, System.Drawing">
-    <value>4, 24</value>
+  <data name="tabLog.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Arial Narrow, 11pt</value>
   </data>
   <data name="$this.Font" type="System.Drawing.Font, System.Drawing">
     <value>Arial Narrow, 11.25pt</value>
   </data>
-  <data name="tabControlPrincipal.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>3, 4, 3, 4</value>
-  </data>
-  <data name="tabMigracao.Size" type="System.Drawing.Size, System.Drawing">
-    <value>809, 532</value>
-  </data>
-  <data name="tabVerificacao.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Arial Narrow, 11pt</value>
-  </data>
-  <data name="tabVerificacao.Size" type="System.Drawing.Size, System.Drawing">
-    <value>809, 532</value>
-  </data>
-  <data name="tabLog.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>3, 4, 3, 4</value>
-  </data>
-  <data name="tabControlPrincipal.Size" type="System.Drawing.Size, System.Drawing">
-    <value>817, 560</value>
-  </data>
-  <data name="&gt;&gt;$this.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Form, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="tabControlPrincipal.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 0</value>
-  </data>
-  <data name="&gt;&gt;$this.Name" xml:space="preserve">
-    <value>FormPrincipal</value>
-  </data>
-  <data name="tabConfig.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Arial Narrow, 11pt</value>
-  </data>
-  <data name="tabVerificacao.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>3, 4, 3, 4</value>
-  </data>
-  <data name="tabMigracao.Text" xml:space="preserve">
-    <value>Migração</value>
-  </data>
-  <data name="tabMigracao.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>3, 4, 3, 4</value>
-  </data>
-  <data name="&gt;&gt;tabMigracao.ZOrder" xml:space="preserve">
-    <value>2</value>
+  <data name="&gt;&gt;tabMigracao.Name" xml:space="preserve">
+    <value>tabMigracao</value>
   </data>
   <data name="&gt;&gt;tabControlPrincipal.Parent" xml:space="preserve">
     <value>$this</value>
   </data>
-  <data name="&gt;&gt;tabLog.Name" xml:space="preserve">
-    <value>tabLog</value>
-  </data>
-  <data name="&gt;&gt;tabControlPrincipal.ZOrder" xml:space="preserve">
+  <data name="&gt;&gt;tabConfig.ZOrder" xml:space="preserve">
     <value>0</value>
-  </data>
-  <data name="tabLog.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Arial Narrow, 11pt</value>
-  </data>
-  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="tabControlPrincipal.TabIndex" type="System.Int32, mscorlib">
-    <value>1</value>
   </data>
   <data name="&gt;&gt;tabLog.Parent" xml:space="preserve">
     <value>tabControlPrincipal</value>
   </data>
-  <data name="&gt;&gt;tabMigracao.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TabPage, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="tabConfig.Text" xml:space="preserve">
+    <value>Configuração</value>
   </data>
-  <data name="tabConfig.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>3, 4, 3, 4</value>
+  <data name="&gt;&gt;$this.Name" xml:space="preserve">
+    <value>FormPrincipal</value>
   </data>
-  <data name="&gt;&gt;tabConfig.Parent" xml:space="preserve">
+  <data name="$this.StartPosition" type="System.Windows.Forms.FormStartPosition, System.Windows.Forms">
+    <value>CenterScreen</value>
+  </data>
+  <data name="&gt;&gt;tabVerificacao.Parent" xml:space="preserve">
     <value>tabControlPrincipal</value>
   </data>
-  <data name="&gt;&gt;tabMigracao.Name" xml:space="preserve">
-    <value>tabMigracao</value>
+  <data name="&gt;&gt;tabEstrutura.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TabPage, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="tabVerificacao.TabIndex" type="System.Int32, mscorlib">
     <value>3</value>
+  </data>
+  <data name="&gt;&gt;tabControlPrincipal.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TabControl, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="tabConfig.Location" type="System.Drawing.Point, System.Drawing">
     <value>4, 29</value>
@@ -235,74 +262,65 @@
   <data name="&gt;&gt;tabMigracao.Parent" xml:space="preserve">
     <value>tabControlPrincipal</value>
   </data>
-  <data name="tabVerificacao.Text" xml:space="preserve">
-    <value>Verificação</value>
+  <data name="tabVerificacao.Size" type="System.Drawing.Size, System.Drawing">
+    <value>809, 532</value>
+  </data>
+  <data name="&gt;&gt;tabControlPrincipal.ZOrder" xml:space="preserve">
+    <value>0</value>
   </data>
   <data name="tabConfig.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
   </data>
-  <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
-    <value>7, 20</value>
+  <data name="&gt;&gt;tabLog.ZOrder" xml:space="preserve">
+    <value>4</value>
   </data>
-  <data name="&gt;&gt;tabLog.Type" xml:space="preserve">
+  <data name="tabLog.Size" type="System.Drawing.Size, System.Drawing">
+    <value>809, 532</value>
+  </data>
+  <data name="&gt;&gt;tabMigracao.Type" xml:space="preserve">
     <value>System.Windows.Forms.TabPage, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;tabVerificacao.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TabPage, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;tabControlPrincipal.Name" xml:space="preserve">
-    <value>tabControlPrincipal</value>
-  </data>
-  <data name="tabControlPrincipal.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
-  </data>
-  <data name="&gt;&gt;tabConfig.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="tabLog.TabIndex" type="System.Int32, mscorlib">
+  <data name="&gt;&gt;tabEstrutura.ZOrder" xml:space="preserve">
     <value>2</value>
   </data>
-  <data name="&gt;&gt;tabVerificacao.Parent" xml:space="preserve">
+  <data name="tabConfig.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>3, 4, 3, 4</value>
+  </data>
+  <data name="&gt;&gt;tabMigracao.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
+    <value>817, 560</value>
+  </data>
+  <data name="&gt;&gt;tabEstrutura.Parent" xml:space="preserve">
     <value>tabControlPrincipal</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>FormPrincipal</value>
   </data>
+  <data name="tabConfig.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Arial Narrow, 11pt</value>
+  </data>
+  <data name="tabVerificacao.Location" type="System.Drawing.Point, System.Drawing">
+    <value>4, 24</value>
+  </data>
+  <data name="&gt;&gt;tabVerificacao.Name" xml:space="preserve">
+    <value>tabVerificacao</value>
+  </data>
+  <data name="&gt;&gt;tabLog.Name" xml:space="preserve">
+    <value>tabLog</value>
+  </data>
+  <data name="tabEstrutura.TabIndex" type="System.Int32, mscorlib">
+    <value>4</value>
+  </data>
   <data name="&gt;&gt;tabVerificacao.ZOrder" xml:space="preserve">
     <value>1</value>
-  </data>
-  <data name="tabConfig.Text" xml:space="preserve">
-    <value>Configuração</value>
-  </data>
-  <data name="&gt;&gt;tabConfig.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TabPage, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="tabConfig.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>3, 4, 3, 4</value>
   </data>
   <data name="tabLog.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>3, 4, 3, 4</value>
   </data>
-  <data name="tabLog.Size" type="System.Drawing.Size, System.Drawing">
-    <value>809, 532</value>
-  </data>
-  <data name="tabMigracao.TabIndex" type="System.Int32, mscorlib">
-    <value>1</value>
-  </data>
-  <data name="tabLog.Location" type="System.Drawing.Point, System.Drawing">
-    <value>4, 24</value>
-  </data>
-  <data name="&gt;&gt;tabLog.ZOrder" xml:space="preserve">
-    <value>3</value>
-  </data>
-  <data name="tabConfig.Size" type="System.Drawing.Size, System.Drawing">
-    <value>809, 527</value>
-  </data>
-  <data name="&gt;&gt;tabConfig.Name" xml:space="preserve">
-    <value>tabConfig</value>
-  </data>
-  <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>817, 560</value>
+  <data name="tabLog.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>3, 4, 3, 4</value>
   </data>
   <metadata name="$this.Language" type="System.Globalization.CultureInfo, System.Private.CoreLib, Culture=neutral, PublicKeyToken=7cec85d7bea7798e">
     <value>pt-BR</value>
