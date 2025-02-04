@@ -143,7 +143,7 @@ namespace BlackSync.Forms
             grid.AutoResizeColumns(); // Redimensiona para caber na grid
         }
 
-        private void btnGerarScripts_Click(object sender, EventArgs e)
+        private async void btnGerarScripts_Click(object sender, EventArgs e)
         {
             if (gridDiferencas.Rows.Count == 0)
             {
@@ -151,27 +151,51 @@ namespace BlackSync.Forms
                 return;
             }
 
-            // Mostrar a barra de progresso antes da execução
+            // Abrir caixa de diálogo para escolher onde salvar o script
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Title = "Salvar Script MySQL",
+                Filter = "Arquivo SQL (*.sql)|*.sql",
+                DefaultExt = "sql",
+                FileName = "script-mysql.sql"
+            };
+
+            if (saveFileDialog.ShowDialog() != DialogResult.OK)
+            {
+                return; // Se o usuário cancelar, não faz nada
+            }
+
+            string caminhoMySQL = saveFileDialog.FileName; // Caminho escolhido pelo usuário
+
+            // Mostrar a barra de progresso antes de iniciar o processo
             progressBarScripts.Visible = true;
-            btnGerarScripts.Enabled = false; // Desativa o botão enquanto gera os scripts
+            progressBarScripts.Value = 0; // Resetar o progresso
+            progressBarScripts.Maximum = gridDiferencas.Rows.Count; // Definir o total de tabelas
+            btnGerarScripts.Enabled = false;
 
             // Recuperar configurações do Firebird
             string firebirdDSN = ConfigService.CarregarConfiguracaoFirebird();
             StringBuilder scriptMySQL = new StringBuilder();
 
-            foreach (DataGridViewRow row in gridDiferencas.Rows)
+            await Task.Run(() =>
             {
-                if (row.Cells[0].Value == null) continue;
-                string tabela = row.Cells[0].Value.ToString();
+                int progresso = 0;
 
-                // Gerar script apenas para tabelas que estão no Firebird e faltam no MySQL
-                scriptMySQL.AppendLine($"-- Criar tabela {tabela} no MySQL");
-                scriptMySQL.AppendLine(ScriptGeneratorService.GerarScriptFirebirdParaMySQL(tabela, firebirdDSN));
-                scriptMySQL.AppendLine();
-            }
+                foreach (DataGridViewRow row in gridDiferencas.Rows)
+                {
+                    if (row.Cells[0].Value == null) continue;
+                    string tabela = row.Cells[0].Value.ToString();
 
-            // Caminho para salvar o arquivo SQL
-            string caminhoMySQL = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "script-mysql.sql");
+                    // Gerar script apenas para tabelas que estão no Firebird e faltam no MySQL
+                    scriptMySQL.AppendLine($"-- Criar tabela {tabela} no MySQL");
+                    scriptMySQL.AppendLine(ScriptGeneratorService.GerarScriptFirebirdParaMySQL(tabela, firebirdDSN));
+                    scriptMySQL.AppendLine();
+
+                    // Atualizar progresso na UI
+                    progresso++;
+                    Invoke(new Action(() => progressBarScripts.Value = progresso));
+                }
+            });
 
             try
             {
@@ -185,10 +209,12 @@ namespace BlackSync.Forms
             }
             finally
             {
-                // Ocultar barra de progresso e reativar botão
+                // Ocultar barra de progresso e reativar botão após a conclusão
                 progressBarScripts.Visible = false;
                 btnGerarScripts.Enabled = true;
             }
         }
+
+
     }
 }
