@@ -113,24 +113,21 @@ namespace BlackSync.Services
         private static string ConverterTipoFirebirdParaMySQL(int tipo, int tamanho)
         {
             Dictionary<int, string> tiposFirebird = new Dictionary<int, string>
-    {
-        { 7, "SMALLINT" },
-        { 8, "INT" },
-        { 16, "BIGINT" },
-        { 10, "FLOAT" },
-        { 27, "DOUBLE" },
-        { 37, $"VARCHAR({tamanho})" },
-        { 14, $"CHAR({tamanho})" },
-        { 12, "DATE" },
-        { 13, "TIME" },
-        { 35, "DATETIME" },
-        { 261, "BLOB" }
-    };
+            {
+                { 7, "SMALLINT" },
+                { 8, "INT" },
+                { 16, "BIGINT" },
+                { 10, "FLOAT" },
+                { 27, "DOUBLE" },
+                { 37, $"VARCHAR({tamanho})" },
+                { 14, $"CHAR({tamanho})" },
+                { 12, "DATE" },
+                { 13, "TIME" },
+                { 35, "DATETIME" },
+                { 261, "BLOB" }
+            };
 
             return tiposFirebird.ContainsKey(tipo) ? tiposFirebird[tipo] : "TEXT";
         }
-
-
-
     }
 }

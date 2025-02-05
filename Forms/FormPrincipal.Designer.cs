@@ -32,9 +32,9 @@
             tabControlPrincipal = new TabControl();
             tabConfig = new TabPage();
             tabVerificacao = new TabPage();
+            tabEstrutura = new TabPage();
             tabMigracao = new TabPage();
             tabLog = new TabPage();
-            tabEstrutura = new TabPage();
             tabControlPrincipal.SuspendLayout();
             SuspendLayout();
             // 
@@ -66,6 +66,12 @@
             tabVerificacao.BackColor = Color.DimGray;
             tabVerificacao.Name = "tabVerificacao";
             // 
+            // tabEstrutura
+            // 
+            resources.ApplyResources(tabEstrutura, "tabEstrutura");
+            tabEstrutura.BackColor = Color.DimGray;
+            tabEstrutura.Name = "tabEstrutura";
+            // 
             // tabMigracao
             // 
             resources.ApplyResources(tabMigracao, "tabMigracao");
@@ -77,12 +83,6 @@
             resources.ApplyResources(tabLog, "tabLog");
             tabLog.BackColor = Color.DimGray;
             tabLog.Name = "tabLog";
-            // 
-            // tabEstrutura
-            // 
-            resources.ApplyResources(tabEstrutura, "tabEstrutura");
-            tabEstrutura.Name = "tabEstrutura";
-            tabEstrutura.UseVisualStyleBackColor = true;
             // 
             // FormPrincipal
             // 

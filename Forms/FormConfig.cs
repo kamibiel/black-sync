@@ -97,16 +97,6 @@ namespace BlackSync.Forms
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("Botão clicado!", "Informação", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
-        private void btnSelecionarBancoFirebird_FileOk(object sender, CancelEventArgs e)
-        {
-            // Apenas para evitar erro de evento não encontrado
-        }
-
         private void FormConfig_Load(object sender, EventArgs e)
         {
             // Código para inicialização do form, se necessário
