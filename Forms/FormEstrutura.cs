@@ -81,16 +81,18 @@ namespace BlackSync.Forms
             pbCarregamentoScripts.Maximum = tabelasSelecionadas.Count;
             btnVerificarEstrutura.Enabled = false;
 
-
             await Task.Run(() =>
             {
+                int progresso = 0;
+
                 CompararEstruturaTabelas(tabelasSelecionadas);
 
                 // Atualizar a barra de progresso na UI Thread
                 Invoke(new Action(() =>
                 {
-                    pbCarregamentoScripts.Value = pbCarregamentoScripts.Maximum;
+                    pbCarregamentoScripts.Value += progresso;
                 }));
+
             });
 
             // Reativar botão e esconder barra de progresso após finalização
