@@ -33,13 +33,12 @@
             gbMySQL = new GroupBox();
             clbTabelasMySQL = new CheckedListBox();
             btnVerificarEstrutura = new Button();
-            gridEstrutura = new DataGridView();
             btnGerarScripts = new Button();
             cbSelecionarTabelas = new CheckBox();
             pbCarregamentoScripts = new ProgressBar();
+            txtSaida = new TextBox();
             gbFirebird.SuspendLayout();
             gbMySQL.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)gridEstrutura).BeginInit();
             SuspendLayout();
             // 
             // gbFirebird
@@ -96,25 +95,18 @@
             btnVerificarEstrutura.UseVisualStyleBackColor = false;
             btnVerificarEstrutura.Click += btnVerificarEstrutura_Click;
             // 
-            // gridEstrutura
-            // 
-            gridEstrutura.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            gridEstrutura.Location = new Point(12, 281);
-            gridEstrutura.Name = "gridEstrutura";
-            gridEstrutura.Size = new Size(282, 85);
-            gridEstrutura.TabIndex = 3;
-            // 
             // btnGerarScripts
             // 
             btnGerarScripts.BackColor = Color.Transparent;
             btnGerarScripts.FlatStyle = FlatStyle.Flat;
             btnGerarScripts.Font = new Font("Arial", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            btnGerarScripts.Location = new Point(300, 301);
+            btnGerarScripts.Location = new Point(297, 346);
             btnGerarScripts.Name = "btnGerarScripts";
             btnGerarScripts.Size = new Size(86, 50);
             btnGerarScripts.TabIndex = 5;
             btnGerarScripts.Text = "Gerar Scripts";
             btnGerarScripts.UseVisualStyleBackColor = false;
+            btnGerarScripts.Click += btnGerarScript_Click;
             // 
             // cbSelecionarTabelas
             // 
@@ -126,33 +118,44 @@
             cbSelecionarTabelas.TabIndex = 3;
             cbSelecionarTabelas.Text = "Selecionar todas as tabelas";
             cbSelecionarTabelas.UseVisualStyleBackColor = true;
+            cbSelecionarTabelas.Click += cbSelecionarTabelas_CheckedChanged;
             // 
             // pbCarregamentoScripts
             // 
-            pbCarregamentoScripts.Location = new Point(12, 372);
+            pbCarregamentoScripts.Location = new Point(9, 461);
             pbCarregamentoScripts.Name = "pbCarregamentoScripts";
             pbCarregamentoScripts.Size = new Size(374, 11);
             pbCarregamentoScripts.TabIndex = 6;
             pbCarregamentoScripts.Visible = false;
+            // 
+            // txtSaida
+            // 
+            txtSaida.Location = new Point(12, 281);
+            txtSaida.Multiline = true;
+            txtSaida.Name = "txtSaida";
+            txtSaida.ReadOnly = true;
+            txtSaida.ScrollBars = ScrollBars.Vertical;
+            txtSaida.Size = new Size(282, 174);
+            txtSaida.TabIndex = 7;
             // 
             // FormEstrutura
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.DimGray;
-            ClientSize = new Size(429, 395);
+            ClientSize = new Size(399, 536);
+            Controls.Add(txtSaida);
             Controls.Add(pbCarregamentoScripts);
             Controls.Add(cbSelecionarTabelas);
             Controls.Add(btnGerarScripts);
-            Controls.Add(gridEstrutura);
             Controls.Add(btnVerificarEstrutura);
             Controls.Add(gbMySQL);
             Controls.Add(gbFirebird);
             Name = "FormEstrutura";
             Text = "FormEstrutura";
+            Load += FormEstrutura_Load;
             gbFirebird.ResumeLayout(false);
             gbMySQL.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)gridEstrutura).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -164,9 +167,9 @@
         private GroupBox gbMySQL;
         private CheckedListBox clbTabelasMySQL;
         private Button btnVerificarEstrutura;
-        private DataGridView gridEstrutura;
         private Button btnGerarScripts;
         private CheckBox cbSelecionarTabelas;
         private ProgressBar pbCarregamentoScripts;
+        private TextBox txtSaida;
     }
 }

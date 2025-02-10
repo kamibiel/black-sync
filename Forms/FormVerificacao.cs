@@ -157,7 +157,7 @@ namespace BlackSync.Forms
                 Title = "Salvar Script MySQL",
                 Filter = "Arquivo SQL (*.sql)|*.sql",
                 DefaultExt = "sql",
-                FileName = "script-mysql.sql"
+                FileName = "script-mysql-verificao.sql"
             };
 
             if (saveFileDialog.ShowDialog() != DialogResult.OK)
@@ -186,7 +186,7 @@ namespace BlackSync.Forms
                     if (row.Cells[0].Value == null) continue;
                     string tabela = row.Cells[0].Value.ToString();
 
-                    // Gerar script apenas para tabelas que estão no Firebird e faltam no MySQL
+                    // Gera script apenas para tabelas que estão no Firebird e faltam no MySQL
                     scriptMySQL.AppendLine($"-- Criar tabela {tabela} no MySQL");
                     scriptMySQL.AppendLine(ScriptGeneratorService.GerarScriptFirebirdParaMySQL(tabela, firebirdDSN));
                     scriptMySQL.AppendLine();
@@ -199,8 +199,7 @@ namespace BlackSync.Forms
 
             try
             {
-                File.WriteAllText(caminhoMySQL, scriptMySQL.ToString());
-
+                File.WriteAllText(caminhoMySQL, scriptMySQL.ToString(), Encoding.UTF8);
                 MessageBox.Show($"Scripts gerados com sucesso!\n\n📄 {caminhoMySQL}", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
@@ -214,7 +213,6 @@ namespace BlackSync.Forms
                 btnGerarScripts.Enabled = true;
             }
         }
-
 
     }
 }

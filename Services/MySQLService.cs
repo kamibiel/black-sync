@@ -69,9 +69,9 @@ namespace BlackSync.Services
         /// <summary>
         /// Obtém a estrutura da tabela no MySQL (nomes e tipos das colunas).
         /// </summary>
-        public List<string> ObterEstruturaTabela(string tabela)
+        public List<(string Nome, string Tipo)> ObterEstruturaTabela(string tabela)
         {
-            List<string> estrutura = new List<string>();
+            List<(string Nome, string Tipo)> estrutura = new List<(string Nome, string Tipo)>();
 
             try
             {
@@ -79,19 +79,19 @@ namespace BlackSync.Services
                 {
                     conn.Open();
                     string query = $@"
-                SELECT COLUMN_NAME, DATA_TYPE, COALESCE(CHARACTER_MAXIMUM_LENGTH, 0) AS TAMANHO
-                FROM INFORMATION_SCHEMA.COLUMNS
-                WHERE TABLE_SCHEMA = '{_banco}' AND TABLE_NAME = '{tabela}'";
+                SELECT COLUMN_NAME, DATA_TYPE 
+                FROM INFORMATION_SCHEMA.COLUMNS 
+                WHERE TABLE_NAME = '{tabela}'";
 
                     using (var cmd = new MySqlCommand(query, conn))
                     using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            string coluna = reader["COLUMN_NAME"].ToString();
-                            string tipo = reader["DATA_TYPE"].ToString();
-                            string tamanho = reader["TAMANHO"].ToString();
-                            estrutura.Add($"{coluna} {tipo}({tamanho})");
+                            string nome = reader["COLUMN_NAME"].ToString().Trim();
+                            string tipo = reader["DATA_TYPE"].ToString().Trim();
+
+                            estrutura.Add((nome, tipo));
                         }
                     }
                 }
@@ -103,6 +103,5 @@ namespace BlackSync.Services
 
             return estrutura;
         }
-
     }
 }

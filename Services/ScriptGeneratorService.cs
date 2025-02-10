@@ -40,8 +40,8 @@ namespace BlackSync.Services
                 { "DATE", "DATE" },
                 { "TIME", "TIME" },
                 { "TIMESTAMP", "DATETIME" },
-                { "BLOB SUB_TYPE 1", "TEXT" }, // Texto grande no Firebird vira TEXT no MySQL
-                { "BLOB SUB_TYPE 0", "BLOB" }  // Dados binários
+                { "BLOB SUB_TYPE 1", "TEXT" },
+                { "BLOB SUB_TYPE 0", "BLOB" }
             };
 
             foreach (var par in conversaoTipos)
@@ -72,6 +72,7 @@ namespace BlackSync.Services
                 rf.RDB$FIELD_NAME AS COLUNA,
                 f.RDB$FIELD_TYPE AS TIPO,
                 COALESCE(f.RDB$FIELD_LENGTH, 0) AS TAMANHO,
+                COALESCE(f.RDB$FIELD_SUB_TYPE, 0) AS SUBTIPO,
                 rf.RDB$NULL_FLAG AS NOT_NULL
             FROM RDB$RELATION_FIELDS rf
             JOIN RDB$FIELDS f ON rf.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME
@@ -81,7 +82,7 @@ namespace BlackSync.Services
                 using (var cmd = new OdbcCommand(query, connection))
                 using (var reader = cmd.ExecuteReader())
                 {
-                    script.AppendLine($"CREATE TABLE `{tabela}` (");
+                    script.AppendLine($"CREATE TABLE `{tabela.ToLower()}` (");
 
                     List<string> colunas = new List<string>();
 
@@ -90,10 +91,11 @@ namespace BlackSync.Services
                         string coluna = reader["COLUNA"].ToString().Trim();
                         int tipo = Convert.ToInt32(reader["TIPO"]);
                         int tamanho = Convert.ToInt32(reader["TAMANHO"]);
+                        int subtipo = Convert.ToInt32(reader["SUBTIPO"]);
                         bool notNull = reader["NOT_NULL"] != DBNull.Value;
 
                         // Converter o tipo Firebird para MySQL
-                        string tipoMySQL = ConverterTipoFirebirdParaMySQL(tipo, tamanho);
+                        string tipoMySQL = ConverterTipoFirebirdParaMySQL(tipo, tamanho, subtipo);
 
                         string colunaSQL = $"`{coluna}` {tipoMySQL}";
                         if (notNull)
@@ -110,7 +112,28 @@ namespace BlackSync.Services
             return script.ToString();
         }
 
-        private static string ConverterTipoFirebirdParaMySQL(int tipo, int tamanho)
+        /// <summary>
+        /// Gera o script de ALTER TABLE para adicionar colunas faltantes no MySQL
+        /// </summary>
+        public static string GerarScriptAlteracao(string tabela, List<(string Nome, string Tipo)> colunasFaltantes)
+        {
+            if (!colunasFaltantes.Any()) return string.Empty;
+
+            StringBuilder scriptAlteracao = new StringBuilder();
+            scriptAlteracao.AppendLine($"ALTER TABLE {tabela.ToLower()} ADD (");
+
+            foreach (var coluna in colunasFaltantes)
+            {
+                scriptAlteracao.AppendLine($"  `{coluna.Nome}` {coluna.Tipo},");
+            }
+
+            scriptAlteracao.Length -= 3; // Remove a última vírgula
+            scriptAlteracao.AppendLine(");\n");
+
+            return scriptAlteracao.ToString();
+        }
+
+        private static string ConverterTipoFirebirdParaMySQL(int tipo, int tamanho, int subtipo)
         {
             Dictionary<int, string> tiposFirebird = new Dictionary<int, string>
             {
@@ -124,7 +147,7 @@ namespace BlackSync.Services
                 { 12, "DATE" },
                 { 13, "TIME" },
                 { 35, "DATETIME" },
-                { 261, "BLOB" }
+                { 261, subtipo == 1 ? "LONGTEXT" : "LONGTEXT" }
             };
 
             return tiposFirebird.ContainsKey(tipo) ? tiposFirebird[tipo] : "TEXT";

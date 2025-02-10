@@ -57,7 +57,7 @@ namespace BlackSync.Services
                 using (var conn = new OdbcConnection(connectionString))
                 {
                     conn.Open();
-                    string query = "SELECT RDB$RELATION_NAME FROM RDB$RELATIONS WHERE RDB$VIEW_SOURCE IS NULL AND RDB$SYSTEM_FLAG = 0;";
+                    string query = "SELECT RDB$RELATION_NAME FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL ORDER BY RDB$RELATION_NAME";
 
                     using (var cmd = new OdbcCommand(query, conn))
                     using (var reader = cmd.ExecuteReader())
@@ -78,11 +78,36 @@ namespace BlackSync.Services
         }
 
         /// <summary>
-        /// Obtém a estrutura da tabela no Firebird (nomes e tipos das colunas).
+        /// Converte os códigos dos tipos do Firebird para nomes reais
         /// </summary>
-        public List<string> ObterEstruturaTabela(string tabela)
+        private string ConverterTipoFirebird(int tipo, int tamanho)
         {
-            List<string> estrutura = new List<string>();
+            Dictionary<int, string> tiposFirebird = new Dictionary<int, string>
+            {
+                { 7, "SMALLINT" },
+                { 8, "INT" },
+                { 16, "BIGINT" }, // 🔹 Firebird usa 16 para BIGINT, mas MySQL pode tratar como DECIMAL
+                { 10, "FLOAT" },
+                { 27, "DOUBLE" },
+                { 37, $"VARCHAR({tamanho})" },
+                { 14, $"CHAR({tamanho})" },
+                { 12, "DATE" },
+                { 13, "TIME" },
+                { 35, "DATETIME" },
+                { 261, "LONGTEXT" }
+            };
+
+            // 🔹 Se for um tipo desconhecido, assume DECIMAL(15,2) por segurança
+            return tiposFirebird.ContainsKey(tipo) ? tiposFirebird[tipo] : "DECIMAL(15,2)";
+        }
+
+        /// <summary>
+        /// Obtém a estrutura da tabela no Firebird (nomes e tipos das colunas).
+        /// Agora retorna uma lista de objetos (Nome, Tipo) para ser compatível com CompararEstrutura().
+        /// </summary>
+        public List<(string Nome, string Tipo)> ObterEstruturaTabela(string tabela)
+        {
+            List<(string Nome, string Tipo)> estrutura = new List<(string Nome, string Tipo)>();
 
             try
             {
@@ -105,9 +130,12 @@ namespace BlackSync.Services
                         while (reader.Read())
                         {
                             string coluna = reader["COLUNA"].ToString().Trim();
-                            string tipo = reader["TIPO"].ToString();
-                            string tamanho = reader["TAMANHO"].ToString();
-                            estrutura.Add($"{coluna} {tipo}({tamanho})");
+                            int tipo = Convert.ToInt32(reader["TIPO"]);
+                            int tamanho = Convert.ToInt32(reader["TAMANHO"]);
+
+                            string tipoConvertido = ConverterTipoFirebird(tipo, tamanho);
+
+                            estrutura.Add((coluna, tipoConvertido));
                         }
                     }
                 }
@@ -120,6 +148,20 @@ namespace BlackSync.Services
             return estrutura;
         }
 
+        /// <summary>
+        /// Método que compara a estrutura das tabelas do Firebird e MySQL
+        /// </summary>
+        public List<(string Nome, string Tipo)> CompararEstrutura(string tabela, MySQLService mySQLService)
+        {
+            var estruturaFirebird = ObterEstruturaTabela(tabela);
+            var estruturaMySQL = mySQLService.ObterEstruturaTabela(tabela.ToLower());
 
+            var colunasMySQL = estruturaMySQL.Select(e => e.Nome.ToUpper()).ToList();
+
+            // Filtrar colunas que existem no Firebird, mas não no MySQL
+            var colunasFaltantes = estruturaFirebird.Where(e => !colunasMySQL.Contains(e.Nome.ToUpper())).ToList();
+
+            return colunasFaltantes;
+        }
     }
 }
