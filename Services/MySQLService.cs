@@ -37,6 +37,19 @@ namespace BlackSync.Services
             }
         }
 
+        public bool VerificarSeTabelaExiste(string tabela)
+        {
+            string query = $"SHOW TABLES LIKE '{tabela}'"; // Verifica se a tabela existe no banco
+
+            using (var connection = new MySqlConnection(connectionString))
+            using (var cmd = new MySqlCommand(query, connection))
+            {
+                connection.Open();
+                var result = cmd.ExecuteScalar();
+                return result != null; // Se houver retorno, a tabela existe
+            }
+        }
+
         public List<string> GetTabelasMySQL()
         {
             List<string> tabelas = new List<string>();
@@ -78,10 +91,13 @@ namespace BlackSync.Services
                 using (var conn = new MySqlConnection(connectionString))
                 {
                     conn.Open();
+
+                    // 🔹 Força a verificação do banco de dados correto
                     string query = $@"
                 SELECT COLUMN_NAME, DATA_TYPE 
                 FROM INFORMATION_SCHEMA.COLUMNS 
-                WHERE TABLE_NAME = '{tabela}'";
+                WHERE TABLE_SCHEMA = '{_banco}' 
+                AND TABLE_NAME COLLATE utf8_general_ci = '{tabela}'"; // 🔹 Comparação case-insensitive
 
                     using (var cmd = new MySqlCommand(query, conn))
                     using (var reader = cmd.ExecuteReader())
@@ -103,5 +119,6 @@ namespace BlackSync.Services
 
             return estrutura;
         }
+
     }
 }

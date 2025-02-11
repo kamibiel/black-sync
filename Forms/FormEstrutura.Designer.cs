@@ -130,6 +130,7 @@
             // 
             // txtSaida
             // 
+            txtSaida.Font = new Font("Arial", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
             txtSaida.Location = new Point(12, 281);
             txtSaida.Multiline = true;
             txtSaida.Name = "txtSaida";

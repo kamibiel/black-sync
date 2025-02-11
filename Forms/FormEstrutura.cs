@@ -43,13 +43,10 @@ namespace BlackSync.Forms
 
         private void cbSelecionarTabelas_CheckedChanged(object sender, EventArgs e)
         {
-            // Verifica o estado do checkbox
             bool marcarTodas = cbSelecionarTabelas.Checked;
 
-            // Atualiza o texto do checkbox dinamicamente
             cbSelecionarTabelas.Text = marcarTodas ? "Desmarcar todas as tabelas" : "Selecionar todas as tabelas";
 
-            // Pecorre os itens do CheckedListBox e marca/desmarca todos
             for (int i = 0; i < clbTabelasFirebird.Items.Count; i++)
             {
                 clbTabelasFirebird.SetItemChecked(i, marcarTodas);
@@ -75,57 +72,80 @@ namespace BlackSync.Forms
                 return;
             }
 
-            // Mostrar a barra de progresso antes de iniciar o processo
             pbCarregamentoScripts.Visible = true;
-            pbCarregamentoScripts.Value = 0; // Resetar o progresso
+            pbCarregamentoScripts.Value = 0;
             pbCarregamentoScripts.Maximum = tabelasSelecionadas.Count;
             btnVerificarEstrutura.Enabled = false;
 
+            tabelasComErro.Clear();
+
             await Task.Run(() =>
             {
-                int progresso = 0;
-
-                CompararEstruturaTabelas(tabelasSelecionadas);
-
-                // Atualizar a barra de progresso na UI Thread
-                Invoke(new Action(() =>
+                for (int i = 0; i < tabelasSelecionadas.Count; i++)
                 {
-                    pbCarregamentoScripts.Value += progresso;
-                }));
+                    var tabelaAtual = tabelasSelecionadas[i];
 
+                    if (CompararEstruturaTabelas(new List<string> { tabelaAtual }))
+                    {
+                        tabelasComErro.Add(tabelaAtual);
+                    }
+
+                    Invoke(new Action(() =>
+                    {
+                        pbCarregamentoScripts.Value = i + 1;
+                    }));
+                }
             });
 
-            // Reativar botão e esconder barra de progresso após finalização
+            // Atualizar a lista de tabelas no clbTabelasFirebird sem limpar completamente
+            Invoke(new Action(() =>
+            {
+                for (int i = 0; i < clbTabelasFirebird.Items.Count; i++)
+                {
+                    string tabela = clbTabelasFirebird.Items[i].ToString();
+                    clbTabelasFirebird.SetItemChecked(i, tabelasComErro.Contains(tabela));
+                }
+            }));
+
             pbCarregamentoScripts.Visible = false;
             btnVerificarEstrutura.Enabled = true;
         }
 
-        private void CompararEstruturaTabelas(List<string> tabelasSelecionadas)
+        private bool CompararEstruturaTabelas(List<string> tabelasSelecionadas)
         {
-            Invoke(new Action(() =>
-            {
-                txtSaida.Clear();
-                tabelasComErro.Clear();
-            }));
-
+            bool encontrouErro = false;
             StringBuilder resultado = new StringBuilder();
 
             foreach (var tabela in tabelasSelecionadas)
             {
-                var colunasFaltantes = _firebirdService.CompararEstrutura(tabela, _mySQLService);
+                var estruturaMySQL = _mySQLService.ObterEstruturaTabela(tabela);
 
-                if (colunasFaltantes.Any())
+                if (estruturaMySQL == null || estruturaMySQL.Count == 0) // 🔹 Verifica se a tabela existe no MySQL
                 {
-                    tabelasComErro.Add(tabela);
-                    resultado.AppendLine($"❌ Tabela {tabela} precisa de ajustes! {colunasFaltantes.Count} colunas faltando.");
+                    encontrouErro = true;
+                    resultado.AppendLine($"🚨 Tabela {tabela} **NÃO EXISTE** no MySQL e precisa ser criada.");
+                }
+                else
+                {
+                    var colunasFaltantes = _firebirdService.CompararEstrutura(tabela, _mySQLService);
+
+                    if (colunasFaltantes.Any())
+                    {
+                        encontrouErro = true;
+                        resultado.AppendLine($"❌ Tabela {tabela} precisa de ajustes! {colunasFaltantes.Count} colunas faltando.");
+                    }
                 }
             }
 
-            // Atualiza a UI após processar todas as tabelas
-            Invoke(new Action(() =>
+            if (encontrouErro)
             {
-                txtSaida.Text = resultado.ToString();
-            }));
+                Invoke(new Action(() =>
+                {
+                    txtSaida.Text += resultado.ToString();
+                }));
+            }
+
+            return encontrouErro;
         }
 
         private void btnGerarScript_Click(object sender, EventArgs e)
@@ -140,15 +160,41 @@ namespace BlackSync.Forms
 
             foreach (var tabela in tabelasComErro)
             {
-                var colunasFaltantes = _firebirdService.CompararEstrutura(tabela, _mySQLService);
-                string script = ScriptGeneratorService.GerarScriptAlteracao(tabela, colunasFaltantes);
+                var estruturaMySQL = _mySQLService.ObterEstruturaTabela(tabela);
 
-                if (!string.IsNullOrEmpty(script))
-                    scriptFinal.AppendLine(script);
+                // 🛑 Debug para verificar a existência da tabela
+                Console.WriteLine($"🔍 Verificando tabela: {tabela}");
+                Console.WriteLine($"🔹 Estrutura retornada: {estruturaMySQL?.Count} colunas");
+
+                // 🔹 Se a estrutura for vazia, usamos o método `VerificarSeTabelaExiste`
+                if (estruturaMySQL == null || estruturaMySQL.Count == 0)
+                {
+                    if (!_mySQLService.VerificarSeTabelaExiste(tabela))
+                    {
+                        scriptFinal.AppendLine($"-- ❌ A tabela {tabela} não existe no MySQL. Precisa ser criada manualmente.");
+                        continue;
+                    }
+                }
+
+                // 🔹 Se a tabela existe, verificamos colunas faltantes e geramos ALTER TABLE
+                var colunasFaltantes = _firebirdService.CompararEstrutura(tabela, _mySQLService);
+                if (colunasFaltantes.Any())
+                {
+                    string alterScript = ScriptGeneratorService.GerarScriptAlteracao(tabela, colunasFaltantes);
+                    if (!string.IsNullOrEmpty(alterScript))
+                        scriptFinal.AppendLine(alterScript);
+                }
+            }
+
+            if (scriptFinal.Length == 0)
+            {
+                MessageBox.Show("Nenhum script necessário!", "Informação", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
             }
 
             SalvarScript(scriptFinal);
         }
+
 
         private void SalvarScript(StringBuilder script)
         {

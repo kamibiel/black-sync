@@ -213,6 +213,5 @@ namespace BlackSync.Forms
                 btnGerarScripts.Enabled = true;
             }
         }
-
     }
 }
