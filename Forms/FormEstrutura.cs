@@ -162,10 +162,6 @@ namespace BlackSync.Forms
             {
                 var estruturaMySQL = _mySQLService.ObterEstruturaTabela(tabela);
 
-                // 🛑 Debug para verificar a existência da tabela
-                Console.WriteLine($"🔍 Verificando tabela: {tabela}");
-                Console.WriteLine($"🔹 Estrutura retornada: {estruturaMySQL?.Count} colunas");
-
                 // 🔹 Se a estrutura for vazia, usamos o método `VerificarSeTabelaExiste`
                 if (estruturaMySQL == null || estruturaMySQL.Count == 0)
                 {
