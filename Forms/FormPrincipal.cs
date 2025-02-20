@@ -70,6 +70,8 @@ namespace BlackSync.Forms
             AdicionarFormularioAba(new FormConfig(this), tabConfig);
             AdicionarFormularioAba(new FormVerificacao(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabVerificacao);
             AdicionarFormularioAba(new FormEstrutura(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabEstrutura);
+            AdicionarFormularioAba(new FormMigracao(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabMigracao);
+            AdicionarFormularioAba(new FormLogs(), tabLog);
         }
 
         private void AdicionarFormularioAba(Form form, TabPage aba)

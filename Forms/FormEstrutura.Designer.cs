@@ -144,7 +144,7 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.DimGray;
-            ClientSize = new Size(399, 536);
+            ClientSize = new Size(393, 481);
             Controls.Add(txtSaida);
             Controls.Add(pbCarregamentoScripts);
             Controls.Add(cbSelecionarTabelas);

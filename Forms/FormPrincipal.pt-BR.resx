@@ -154,6 +154,31 @@
   <data name="tabMigracao.Size" type="System.Drawing.Size, System.Drawing">
     <value>742, 527</value>
   </data>
+  <data name="tabUtilidades.Location" type="System.Drawing.Point, System.Drawing">
+    <value>4, 29</value>
+  </data>
+  <data name="tabUtilidades.Size" type="System.Drawing.Size, System.Drawing">
+    <value>742, 527</value>
+  </data>
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="tabUtilidades.TabIndex" type="System.Int32, mscorlib">
+    <value>5</value>
+  </data>
+  <data name="tabUtilidades.Text" xml:space="preserve">
+    <value>Utilidades</value>
+  </data>
+  <data name="tabParametros.Location" type="System.Drawing.Point, System.Drawing">
+    <value>4, 29</value>
+  </data>
+  <data name="tabParametros.Size" type="System.Drawing.Size, System.Drawing">
+    <value>742, 527</value>
+  </data>
+  <data name="tabParametros.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="tabParametros.Text" xml:space="preserve">
+    <value>Parametros</value>
+  </data>
   <data name="tabLog.Font" type="System.Drawing.Font, System.Drawing">
     <value>Arial, 11.25pt, style=Bold</value>
   </data>

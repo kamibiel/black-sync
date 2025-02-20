@@ -128,7 +128,8 @@ namespace BlackSync.Services
             }
 
             scriptAlteracao.Length -= 3; // Remove a última vírgula
-            scriptAlteracao.AppendLine(");\n");
+            //scriptAlteracao.AppendLine(");\n");
+            scriptAlteracao.AppendLine(");");
 
             return scriptAlteracao.ToString();
         }

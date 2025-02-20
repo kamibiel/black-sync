@@ -76,6 +76,7 @@ namespace BlackSync.Forms
             pbCarregamentoScripts.Value = 0;
             pbCarregamentoScripts.Maximum = tabelasSelecionadas.Count;
             btnVerificarEstrutura.Enabled = false;
+            btnGerarScripts.Enabled = false;
 
             tabelasComErro.Clear();
 
@@ -109,6 +110,7 @@ namespace BlackSync.Forms
 
             pbCarregamentoScripts.Visible = false;
             btnVerificarEstrutura.Enabled = true;
+            btnGerarScripts.Enabled = true;
         }
 
         private bool CompararEstruturaTabelas(List<string> tabelasSelecionadas)
@@ -148,7 +150,7 @@ namespace BlackSync.Forms
             return encontrouErro;
         }
 
-        private void btnGerarScript_Click(object sender, EventArgs e)
+        private async void btnGerarScript_Click(object sender, EventArgs e)
         {
             if (tabelasComErro.Count == 0)
             {
@@ -158,37 +160,62 @@ namespace BlackSync.Forms
 
             StringBuilder scriptFinal = new StringBuilder();
 
-            foreach (var tabela in tabelasComErro)
+            // 🔹 Configuração da barra de progresso
+            pbCarregamentoScripts.Visible = true;
+            pbCarregamentoScripts.Value = 0;
+            pbCarregamentoScripts.Maximum = tabelasComErro.Count;
+            btnVerificarEstrutura.Enabled = false;
+            btnGerarScripts.Enabled = false; 
+
+            await Task.Run(() =>
             {
-                var estruturaMySQL = _mySQLService.ObterEstruturaTabela(tabela);
-
-                // 🔹 Se a estrutura for vazia, usamos o método `VerificarSeTabelaExiste`
-                if (estruturaMySQL == null || estruturaMySQL.Count == 0)
+                for (int i = 0; i < tabelasComErro.Count; i++)
                 {
-                    if (!_mySQLService.VerificarSeTabelaExiste(tabela))
+                    string tabela = tabelasComErro[i];
+
+                    var estruturaMySQL = _mySQLService.ObterEstruturaTabela(tabela);
+
+                    if (estruturaMySQL == null || estruturaMySQL.Count == 0)
                     {
-                        scriptFinal.AppendLine($"-- ❌ A tabela {tabela} não existe no MySQL. Precisa ser criada manualmente.");
-                        continue;
+                        if (!_mySQLService.VerificarSeTabelaExiste(tabela))
+                        {
+                            scriptFinal.AppendLine($"-- ❌ A tabela {tabela} não existe no MySQL. Precisa ser criada manualmente.");
+                            scriptFinal.AppendLine();
+                            continue;
+                        }
                     }
-                }
 
-                // 🔹 Se a tabela existe, verificamos colunas faltantes e geramos ALTER TABLE
-                var colunasFaltantes = _firebirdService.CompararEstrutura(tabela, _mySQLService);
-                if (colunasFaltantes.Any())
-                {
-                    string alterScript = ScriptGeneratorService.GerarScriptAlteracao(tabela, colunasFaltantes);
-                    if (!string.IsNullOrEmpty(alterScript))
-                        scriptFinal.AppendLine(alterScript);
+                    // 🔹 Se a tabela existe, verificamos colunas faltantes e geramos ALTER TABLE
+                    var colunasFaltantes = _firebirdService.CompararEstrutura(tabela, _mySQLService);
+                    if (colunasFaltantes.Any())
+                    {
+                        string alterScript = ScriptGeneratorService.GerarScriptAlteracao(tabela, colunasFaltantes);
+                        if (!string.IsNullOrEmpty(alterScript))
+                            scriptFinal.AppendLine(alterScript);
+                    }
+
+                    // 🔹 Atualiza a barra de progresso na UI (Precisa ser chamado no Thread da UI)
+                    Invoke(new Action(() =>
+                    {
+                        pbCarregamentoScripts.Value = i + 1;
+                    }));
                 }
-            }
+            });
 
             if (scriptFinal.Length == 0)
             {
                 MessageBox.Show("Nenhum script necessário!", "Informação", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
+            }
+            else
+            {
+                SalvarScript(scriptFinal);
             }
 
-            SalvarScript(scriptFinal);
+            // 🔹 Resetar UI ao final da execução
+            pbCarregamentoScripts.Visible = false;
+            btnVerificarEstrutura.Enabled = true;
+            btnGerarScripts.Enabled = true;
+
         }
 
 
