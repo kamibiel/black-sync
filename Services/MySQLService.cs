@@ -199,15 +199,15 @@ namespace BlackSync.Services
 
             try
             {
-                using (var conn = new OdbcConnection(connectionString))
+                using (var conn = new MySqlConnection(connectionString))
                 {
                     conn.Open();
                     string query = $"SELECT * FROM \"{tabela}\"";
 
                     Console.WriteLine($"🔍 Executando consulta: {query}"); // Log para depuração
 
-                    using (var cmd = new OdbcCommand(query, conn))
-                    using (var adapter = new OdbcDataAdapter(cmd))
+                    using (var cmd = new MySqlCommand(query, conn))
+                    using (var adapter = new MySqlDataAdapter(cmd))
                     {
                         adapter.Fill(dt);
                     }
@@ -227,14 +227,14 @@ namespace BlackSync.Services
 
             try
             {
-                using (var conn = new OdbcConnection(connectionString))
+                using (var conn = new MySqlConnection(connectionString))
                 {
                     conn.Open();
                     string query = $@"
                 SELECT RDB$FIELD_NAME FROM RDB$RELATION_FIELDS 
                 WHERE RDB$RELATION_NAME = '{tabela.ToUpper()}'";
 
-                    using (var cmd = new OdbcCommand(query, conn))
+                    using (var cmd = new MySqlCommand(query, conn))
                     using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
@@ -366,7 +366,7 @@ namespace BlackSync.Services
                             }
                             else if (tipoColuna != null && (tipoColuna.Contains("date") || tipoColuna.Contains("datetime")))
                             {
-                                valor = DateTime.TryParse(valor, out DateTime dataConvertida) ? $"'{dataConvertida:yyyy-MM-dd HH:mm:ss}'" : "NULL";
+                                valor = DateTime.TryParse(valor, out DateTime dataConvertida) ? $"'{dataConvertida:yyyy-MM-dd}'" : "NULL";
                             }
                             else
                             {

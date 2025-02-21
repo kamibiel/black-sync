@@ -13,6 +13,9 @@ namespace BlackSync.Forms
 {
     public partial class FormPrincipal : Form
     {
+        private MySQLService _mySQLService;
+        private FirebirdService _firebirdService;
+
         private static readonly string confiFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.ini");
         
         public FormPrincipal()
@@ -22,6 +25,9 @@ namespace BlackSync.Forms
             CarregarFormularios();
             this.ShowInTaskbar = true;
         }
+
+        public MySQLService ObterMySQLService() => _mySQLService;
+        public FirebirdService ObterFirebirdService() => _firebirdService;
 
         public TabControl TabControlPrincipal
         {
@@ -67,12 +73,47 @@ namespace BlackSync.Forms
             string mysqlPassword = ConfigService.CarregarConfiguracaoMySQL().senha;
             string firebirdDSN = ConfigService.CarregarConfiguracaoFirebird();
 
+            _mySQLService = new MySQLService(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword);
+            _firebirdService = new FirebirdService(firebirdDSN);
+
             AdicionarFormularioAba(new FormConfig(this), tabConfig);
             AdicionarFormularioAba(new FormVerificacao(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabVerificacao);
             AdicionarFormularioAba(new FormEstrutura(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabEstrutura);
-            AdicionarFormularioAba(new FormMigracao(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabMigracao);
+            AdicionarFormularioAba(new FormMigracao(this, mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabMigracao);
             AdicionarFormularioAba(new FormLogs(), tabLog);
         }
+
+        public void AtualizarServicos()
+        {
+            (string mysqlServer, string mysqlDatabase, string mysqlUser, string mysqlPassword) = ConfigService.CarregarConfiguracaoMySQL();
+            string firebirdDSN = ConfigService.CarregarConfiguracaoFirebird();
+
+            _mySQLService = new MySQLService(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword);
+            _firebirdService = new FirebirdService(firebirdDSN);
+
+            LogService.RegistrarLog("SUCCESS", $"🔄 Serviços de banco de dados foram atualizados com novas configurações.");
+
+            AtualizarFormularios();
+        }
+
+        public void AtualizarFormularios()
+        {
+            tabVerificacao.Controls.Clear();
+            tabEstrutura.Controls.Clear();
+            tabMigracao.Controls.Clear();
+
+            string mysqlServer = ConfigService.CarregarConfiguracaoMySQL().servidor;
+            string mysqlDatabase = ConfigService.CarregarConfiguracaoMySQL().banco;
+            string mysqlUser = ConfigService.CarregarConfiguracaoMySQL().usuario;
+            string mysqlPassword = ConfigService.CarregarConfiguracaoMySQL().senha;
+            string firebirdDSN = ConfigService.CarregarConfiguracaoFirebird();
+
+            // Recria os formulários com as novas configurações
+            AdicionarFormularioAba(new FormVerificacao(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabVerificacao);
+            AdicionarFormularioAba(new FormEstrutura(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabEstrutura);
+            AdicionarFormularioAba(new FormMigracao(this, mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabMigracao);
+        }
+
 
         private void AdicionarFormularioAba(Form form, TabPage aba)
         {

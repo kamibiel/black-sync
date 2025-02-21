@@ -37,7 +37,6 @@
             gbLog = new GroupBox();
             txtLog = new TextBox();
             btnMigrar = new Button();
-            btnGerarScripts = new Button();
             gbFirebirdM.SuspendLayout();
             gbMySQLM.SuspendLayout();
             gbLog.SuspendLayout();
@@ -135,24 +134,12 @@
             btnMigrar.UseVisualStyleBackColor = true;
             btnMigrar.Click += btnMigrar_Click;
             // 
-            // btnGerarScripts
-            // 
-            btnGerarScripts.FlatStyle = FlatStyle.Flat;
-            btnGerarScripts.Font = new Font("Arial", 9.75F);
-            btnGerarScripts.Location = new Point(259, 427);
-            btnGerarScripts.Name = "btnGerarScripts";
-            btnGerarScripts.Size = new Size(127, 37);
-            btnGerarScripts.TabIndex = 6;
-            btnGerarScripts.Text = "Gerar scripts";
-            btnGerarScripts.UseVisualStyleBackColor = true;
-            // 
             // FormMigracao
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.DimGray;
             ClientSize = new Size(393, 481);
-            Controls.Add(btnGerarScripts);
             Controls.Add(btnMigrar);
             Controls.Add(gbLog);
             Controls.Add(pbMigracao);
@@ -178,7 +165,6 @@
         private GroupBox gbLog;
         private Button btnMigrar;
         private TextBox txtLog;
-        private Button btnGerarScripts;
         private CheckedListBox clbTabelasFirebird;
         private CheckedListBox clbTabelasMySQL;
     }

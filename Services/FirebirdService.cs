@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace BlackSync.Services
 {
-    internal class FirebirdService
+    public class FirebirdService
     {
         private string connectionString;
 
@@ -179,9 +179,7 @@ namespace BlackSync.Services
                     while (hasMoreData)
                     {
                         // 🔹 Corrigindo a query SQL
-                        string query = $@"
-                    SELECT FIRST {tamanhoLote} SKIP {offset} * 
-                    FROM {tabela}";
+                        string query = $@"SELECT FIRST {tamanhoLote} SKIP {offset} * FROM {tabela}";
 
                         using (var cmd = new OdbcCommand(query, conn))
                         using (var adapter = new OdbcDataAdapter(cmd))

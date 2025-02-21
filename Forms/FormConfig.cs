@@ -69,6 +69,25 @@ namespace BlackSync.Forms
             firebirdService.TestarConexao();
         }
 
+        //private void btnSalvar_Click(object sender, EventArgs e)
+        //{
+        //    // Salvar MySQL
+        //    string servidorMySQL = txtServidor.Text;
+        //    string bancoMySQL = txtBanco.Text;
+        //    string usuarioMySQL = txtUsuario.Text;
+        //    string senhaMySQL = txtSenha.Text;
+        //    ConfigService.SalvarConfiguracaoMySQL(servidorMySQL, bancoMySQL, usuarioMySQL, senhaMySQL);
+
+        //    // Salvar Firebird
+        //    string dsnFirebird = txtDSN.Text;
+        //    ConfigService.SalvarConfiguracaoFirebird(dsnFirebird);
+
+        //    _formPrincipal.AtualizarServicos();
+
+        //    LogService.RegistrarLog("SUCCESS", $"✅ Configurações de MySQL e Firebird salvas com sucesso!");
+        //    MessageBox.Show("Configurações de MySQL e Firebird salvas com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //}
+
         private void btnSalvar_Click(object sender, EventArgs e)
         {
             // Salvar MySQL
@@ -82,6 +101,11 @@ namespace BlackSync.Forms
             string dsnFirebird = txtDSN.Text;
             ConfigService.SalvarConfiguracaoFirebird(dsnFirebird);
 
+            // 🔹 Atualiza imediatamente os serviços antes de exibir a mensagem
+            _formPrincipal.AtualizarServicos();
+
+            // Log e mensagem ao usuário
+            LogService.RegistrarLog("SUCCESS", $"✅ Configurações de MySQL e Firebird salvas com sucesso!");
             MessageBox.Show("Configurações de MySQL e Firebird salvas com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 

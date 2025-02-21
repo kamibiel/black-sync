@@ -5,6 +5,8 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Globalization;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -15,14 +17,24 @@ namespace BlackSync.Forms
     {
         private readonly MySQLService _mySQLService;
         private readonly FirebirdService _firebirdService;
+        private readonly FormPrincipal _formPrincipal;
 
-        public FormMigracao(string mysqlServer, string mysqlDatabase, string mysqlUser, string mysqlPassword, string firebirdDSN)
+        public FormMigracao(FormPrincipal formprincipal, string mysqlServer, string mysqlDatabase, string mysqlUser, string mysqlPassword, string firebirdDSN)
         {
             InitializeComponent();
-            _mySQLService = new MySQLService(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword);
-            _firebirdService = new FirebirdService(firebirdDSN);
+            _formPrincipal = formprincipal ?? throw new ArgumentNullException(nameof(formprincipal));
+
+            //_mySQLService = new MySQLService(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword);
+            //_firebirdService = new FirebirdService(firebirdDSN);
+
+            _mySQLService = _formPrincipal.ObterMySQLService();
+            _firebirdService = _formPrincipal.ObterFirebirdService();
+
             CarregarTabelas();
         }
+
+        public MySQLService ObterMySQLService() => _mySQLService;
+        public FirebirdService ObterFirebirdService() => _firebirdService;
 
         private void CarregarTabelas()
         {
@@ -59,6 +71,7 @@ namespace BlackSync.Forms
 
         private async void btnMigrar_Click(object sender, EventArgs e)
         {
+
             var tabelasSelecionadas = ObterTabelasSelecionadas();
 
             if (tabelasSelecionadas.Count == 0)
@@ -72,7 +85,6 @@ namespace BlackSync.Forms
             pbMigracao.Visible = true;
             pbMigracao.Value = 0;
             btnMigrar.Enabled = false;
-            btnGerarScripts.Enabled = false;
             Invoke(new Action(() => txtLog.Clear()));
             txtLog.AppendText($"🔄 Iniciando migração de {tabelasSelecionadas.Count} tabelas...{Environment.NewLine}");
 
@@ -215,16 +227,12 @@ namespace BlackSync.Forms
                 }
             });
 
-            LogService.RegistrarLog("INFO", $"🎉 Migração concluída!{Environment.NewLine}");
+            LogService.RegistrarLog("INFO", $"🎉 Migração concluída!");
             pbMigracao.Visible = false;
             btnMigrar.Enabled = true;
-            btnGerarScripts.Enabled = true;
             txtLog.AppendText($"🎉 Migração concluída!{Environment.NewLine}");
+
+            _formPrincipal.AtualizarServicos();
         }
-
-        //private async void btnGerarScripts_Click(object sender, EventArgs e)
-        //{
-
-        //}
     }
 }
