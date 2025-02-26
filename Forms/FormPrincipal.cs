@@ -39,7 +39,12 @@ namespace BlackSync.Forms
             // Se o config.ini existir, perguntar ao usuário
             if (File.Exists(confiFilePath))
             {
-                DialogResult resultado = MessageBox.Show("Deseja manter a configuração existente?", "Configuração Detectada", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                DialogResult resultado = MessageBox.Show(
+                    "Deseja manter a configuração existente?", 
+                    "Configuração Detectada", 
+                    MessageBoxButtons.YesNo, 
+                    MessageBoxIcon.Question
+                );
 
                 // Garante que o formulário de configuração seja carregado antes da troca de aba
                 FormConfig formConfig = new FormConfig(this);
@@ -47,20 +52,27 @@ namespace BlackSync.Forms
 
                 if (resultado == DialogResult.Yes)
                 {
-                    // Carrega os dados da configuração antes de mudar para a aba de verificação
+                    // Se o usuário escolher "Sim", carrega e atualiza os serviços apenas uma vez
+                    LogService.RegistrarLog("INFO", "🔄 Carregando configuração salva...");
                     formConfig.CarregarConfiguracao();
+                    AtualizarServicos(); // Atualiza os serviços
                     tabControlPrincipal.SelectedTab = tabVerificacao;
                 }
                 else
                 {
-                    // Abre a aba "Configuração"
+                    // Se o usuário escolher "Não", envia para a tela de configuração
                     tabControlPrincipal.SelectedTab = tabConfig;
                 }
             }
             else
             {
                 // Se não existir config.ini, abre a aba "Configuração"
-                MessageBox.Show("Nenhuma configuração encontrada. Por favor, configure o sistema.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(
+                    "Nenhuma configuração encontrada. Por favor, configure o sistema.", 
+                    "Aviso", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Warning
+                );
                 tabControlPrincipal.SelectedTab = tabConfig;
             }
         }

@@ -88,9 +88,9 @@
             cbMarcarTodas.Font = new Font("Arial", 9.75F);
             cbMarcarTodas.Location = new Point(11, 240);
             cbMarcarTodas.Name = "cbMarcarTodas";
-            cbMarcarTodas.Size = new Size(166, 20);
+            cbMarcarTodas.Size = new Size(187, 20);
             cbMarcarTodas.TabIndex = 2;
-            cbMarcarTodas.Text = "Marcar todas as tabelas";
+            cbMarcarTodas.Text = "Selecionar todas as tabelas";
             cbMarcarTodas.UseVisualStyleBackColor = true;
             cbMarcarTodas.Click += cbMarcarTodas_CheckedChanged;
             // 

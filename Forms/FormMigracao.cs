@@ -31,6 +31,9 @@ namespace BlackSync.Forms
             _firebirdService = _formPrincipal.ObterFirebirdService();
 
             CarregarTabelas();
+
+            // 🔹 Conecta o evento para atualizar automaticamente o checkbox
+            clbTabelasFirebird.ItemCheck += clbTabelasFirebird_ItemCheck;
         }
 
         public MySQLService ObterMySQLService() => _mySQLService;
@@ -56,12 +59,61 @@ namespace BlackSync.Forms
         {
             bool marcarTodas = cbMarcarTodas.Checked;
 
-            cbMarcarTodas.Text = marcarTodas ? "Desmarcar todas a tabelas" : "Selecionar todas as tabelas";
+            // Temporariamente desativa o evento para evitar loop infinito
+            clbTabelasFirebird.ItemCheck -= clbTabelasFirebird_ItemCheck;
 
-            for (int i = 0; i< clbTabelasFirebird.Items.Count; i++)
+            for (int i = 0; i < clbTabelasFirebird.Items.Count; i++)
             {
                 clbTabelasFirebird.SetItemChecked(i, marcarTodas);
             }
+
+            // Atualiza o texto do checkbox
+            cbMarcarTodas.Text = marcarTodas ? "Desmarcar todas as tabelas" : "Selecionar todas as tabelas";
+
+            // Reativa o evento
+            clbTabelasFirebird.ItemCheck += clbTabelasFirebird_ItemCheck;
+        }
+
+        private void clbTabelasFirebird_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            this.BeginInvoke((MethodInvoker)delegate
+            {
+                int totalItens = clbTabelasFirebird.Items.Count;
+                int itensSelecionados = 0;
+
+                // Conta os itens já selecionados e adiciona a mudança atual do evento
+                for (int i = 0; i < totalItens; i++)
+                {
+                    if (clbTabelasFirebird.GetItemCheckState(i) == CheckState.Checked || (i == e.Index && e.NewValue == CheckState.Checked))
+                    {
+                        itensSelecionados++;
+                    }
+                }
+
+                // Temporariamente desativa o evento para evitar loops
+                cbMarcarTodas.CheckedChanged -= cbMarcarTodas_CheckedChanged;
+
+                // Atualiza o estado do checkbox principal
+                if (itensSelecionados == totalItens)
+                {
+                    cbMarcarTodas.Checked = true;
+                    cbMarcarTodas.Text = "Desmarcar todas as tabelas";
+                }
+                else if (itensSelecionados == 0)
+                {
+                    cbMarcarTodas.Checked = false;
+                    cbMarcarTodas.Text = "Selecionar todas as tabelas";
+                }
+                else
+                {
+                    cbMarcarTodas.Checked = false;
+                    cbMarcarTodas.CheckState = CheckState.Indeterminate; // Estado intermediário
+                    cbMarcarTodas.Text = "Desmarcar todas as tabelas";
+                }
+
+                // Reativa o evento do checkbox
+                cbMarcarTodas.CheckedChanged += cbMarcarTodas_CheckedChanged;
+            });
         }
 
         private List<string> ObterTabelasSelecionadas()
@@ -71,22 +123,31 @@ namespace BlackSync.Forms
 
         private async void btnMigrar_Click(object sender, EventArgs e)
         {
+            LogService.RegistrarLog("INFO", $"🔄 Limpando o Log Verificação");
+            txtLog.Clear();
+            pbMigracao.Value = 0;
 
             var tabelasSelecionadas = ObterTabelasSelecionadas();
 
             if (tabelasSelecionadas.Count == 0)
             {
-                MessageBox.Show("Por favor, selecione ao menos uma tabela para migrar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(
+                    "Por favor, selecione ao menos uma tabela para migrar.", 
+                    "Aviso", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Warning
+                );
                 return;
             }
 
-            LogService.RegistrarLog("INFO", $"🔄 Iniciando migração de {tabelasSelecionadas.Count} tabelas.");
+            LogService.RegistrarLog(
+                "INFO", 
+                $"🔄 Iniciando migração de {tabelasSelecionadas.Count} tabelas."
+            );
+            txtLog.AppendText($"🔄 Iniciando migração de {tabelasSelecionadas.Count} tabelas...{Environment.NewLine}");
 
             pbMigracao.Visible = true;
-            pbMigracao.Value = 0;
             btnMigrar.Enabled = false;
-            Invoke(new Action(() => txtLog.Clear()));
-            txtLog.AppendText($"🔄 Iniciando migração de {tabelasSelecionadas.Count} tabelas...{Environment.NewLine}");
 
             // 🔹 Obtém o total de registros antes de iniciar a migração
             int totalRegistros = _firebirdService.ObterTotalRegistros(tabelasSelecionadas);
@@ -173,7 +234,6 @@ namespace BlackSync.Forms
                             _mySQLService.InserirDadosTabela(tabela, dados);
                             registrosMigrados += dados.Rows.Count;
 
-                            // 🔹 Atualiza progress bar de forma segura
                             Invoke(new Action(() =>
                             {
                                 pbMigracao.Value = Math.Min(pbMigracao.Maximum, pbMigracao.Value + dados.Rows.Count);
@@ -185,38 +245,18 @@ namespace BlackSync.Forms
 
                         if (_firebirdService.ColunaExiste(tabela, "Enviado"))
                         {
-                            var respostaEnviadoFirebird = MessageBox.Show($"Deseja realizar update da coluna ENVIADO da tabela: {tabela} do Banco de Dados Firebird?{Environment.NewLine}", "Confirmação", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-
-                            if (respostaEnviadoFirebird == DialogResult.Yes)
-                            {
-                                _firebirdService.AtualizarEnviado(tabela);
+                            _firebirdService.AtualizarEnviado(tabela);
 
                                 LogService.RegistrarLog("INFO", $"📤 Registros atualizados como enviados no Firebird para {tabela}.");
                                 Invoke(new Action(() => txtLog.AppendText($"📤 Registros atualizados como enviados no Firebird para {tabela}.{Environment.NewLine}")));
-                            }
-                            else
-                            {
-                                LogService.RegistrarLog("INFO", $"📤 Ação cancelada, não foi realizado a atualização na tabela: {tabela}.");
-                                Invoke(new Action(() => txtLog.AppendText($"📤 Ação cancelada, não foi realizado a atualização na tabela: {tabela}.{Environment.NewLine}")));
-                            }
                         }
 
                         if (_mySQLService.ColunaExiste(tabela, "Enviado"))
                         {
-                            var respostaEnviadoMySQL = MessageBox.Show($"Deseja realizar update da coluna ENVIADO da tabela: {tabela} do Banco de Dados MySQL?{Environment.NewLine}", "Confirmação", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-
-                            if (respostaEnviadoMySQL == DialogResult.Yes)
-                            {
-                                _mySQLService.AtualizarEnviado(tabela);
+                           _mySQLService.AtualizarEnviado(tabela);
 
                                 LogService.RegistrarLog("SUCCESS", $"📤 Registros atualizados como enviados no MySQL para {tabela}.");
                                 Invoke(new Action(() => txtLog.AppendText($"📤 Registros atualizados como enviados no MySQL para {tabela}.{Environment.NewLine}")));
-                            }
-                            else
-                            {
-                                LogService.RegistrarLog("INFO", $"📤 Ação cancelada, não foi realizado a atualização na tabela: {tabela}.");
-                                Invoke(new Action(() => txtLog.AppendText($"📤 Ação cancelada, não foi realizado a atualização na tabela: {tabela}.{Environment.NewLine}")));
-                            }
                         }
                     }
                     catch (Exception ex)
@@ -231,8 +271,6 @@ namespace BlackSync.Forms
             pbMigracao.Visible = false;
             btnMigrar.Enabled = true;
             txtLog.AppendText($"🎉 Migração concluída!{Environment.NewLine}");
-
-            _formPrincipal.AtualizarServicos();
         }
     }
 }

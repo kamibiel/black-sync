@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Odbc;
@@ -388,16 +389,12 @@ namespace BlackSync.Services
                         {
                             InserirLoteNoBanco(tabelaMySQL, colunasValidas, colunasExtrasMySQL, batchInserts, conn);
                             batchInserts.Clear();
-
-                            // 🔹 Log após cada batch inserido
-                            //LogService.RegistrarLog("SUCCESS", $"✅ {batchSize} registros inseridos na tabela {tabela}.");
                         }
                     }
 
                     if (batchInserts.Count > 0)
                     {
                         InserirLoteNoBanco(tabelaMySQL, colunasValidas, colunasExtrasMySQL, batchInserts, conn);
-                        //LogService.RegistrarLog("SUCCESS", $"✅ Últimos {batchInserts.Count} registros inseridos na tabela {tabela}.");
                     }
 
                     LogService.RegistrarLog("SUCCESS", $"🎉 Total de {totalInseridos} registros inseridos na tabela {tabela}.");
@@ -412,11 +409,29 @@ namespace BlackSync.Services
         /// <summary>
         /// Método para inserir um lote no banco de dados
         /// </summary>
+        //private void InserirLoteNoBanco(string tabela, List<string> colunasValidas, List<string> colunasExtrasMySQL, List<string> batchInserts, MySqlConnection conn)
+        //{
+        //    try
+        //    {
+        //        string query = $"INSERT INTO `{tabela}` ({string.Join(", ", colunasValidas.Concat(colunasExtrasMySQL))}) VALUES {string.Join(", ", batchInserts)};";
+        //        using (var cmd = new MySqlCommand(query, conn))
+        //        {
+        //            cmd.ExecuteNonQuery();
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        LogService.RegistrarLog("ERROR", $"❌ Erro ao inserir lote na tabela {tabela}: {ex.Message}");
+        //    }
+        //}
+
         private void InserirLoteNoBanco(string tabela, List<string> colunasValidas, List<string> colunasExtrasMySQL, List<string> batchInserts, MySqlConnection conn)
         {
             try
             {
+                // 🔹 Primeiro, tenta inserir todo o lote de uma vez
                 string query = $"INSERT INTO `{tabela}` ({string.Join(", ", colunasValidas.Concat(colunasExtrasMySQL))}) VALUES {string.Join(", ", batchInserts)};";
+
                 using (var cmd = new MySqlCommand(query, conn))
                 {
                     cmd.ExecuteNonQuery();
@@ -425,6 +440,26 @@ namespace BlackSync.Services
             catch (Exception ex)
             {
                 LogService.RegistrarLog("ERROR", $"❌ Erro ao inserir lote na tabela {tabela}: {ex.Message}");
+                LogService.RegistrarLog("ERROR", $"📌 Tentativa de lote com erro: {batchInserts.Count} registros.");
+
+                // 🔹 Se falhar, insere cada linha individualmente para capturar o erro exato
+                foreach (string values in batchInserts)
+                {
+                    string query = $"INSERT INTO `{tabela}` ({string.Join(", ", colunasValidas.Concat(colunasExtrasMySQL))}) VALUES {values};";
+
+                    try
+                    {
+                        using (var cmd = new MySqlCommand(query, conn))
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                    catch (Exception exLinha)
+                    {
+                        LogService.RegistrarLog("ERROR", $"❌ Erro ao inserir na tabela {tabela}: {exLinha.Message}");
+                        LogService.RegistrarLog("ERROR", $"📌 Query com erro: {query}");
+                    }
+                }
             }
         }
 
