@@ -122,7 +122,7 @@
     <value>Arial, 11.25pt, style=Bold</value>
   </data>
   <data name="tabConfig.Size" type="System.Drawing.Size, System.Drawing">
-    <value>742, 527</value>
+    <value>655, 570</value>
   </data>
   <data name="tabVerificacao.Font" type="System.Drawing.Font, System.Drawing">
     <value>Arial, 12pt, style=Bold</value>
@@ -131,7 +131,7 @@
     <value>4, 29</value>
   </data>
   <data name="tabVerificacao.Size" type="System.Drawing.Size, System.Drawing">
-    <value>742, 527</value>
+    <value>588, 570</value>
   </data>
   <data name="tabVerificacao.Text" xml:space="preserve">
     <value>Tabelas</value>
@@ -140,7 +140,7 @@
     <value>Arial, 11.25pt, style=Bold</value>
   </data>
   <data name="tabEstrutura.Size" type="System.Drawing.Size, System.Drawing">
-    <value>742, 527</value>
+    <value>588, 570</value>
   </data>
   <data name="tabEstrutura.Text" xml:space="preserve">
     <value>Estrutura</value>
@@ -152,32 +152,13 @@
     <value>4, 29</value>
   </data>
   <data name="tabMigracao.Size" type="System.Drawing.Size, System.Drawing">
-    <value>742, 527</value>
+    <value>588, 570</value>
   </data>
-  <data name="tabUtilidades.Location" type="System.Drawing.Point, System.Drawing">
-    <value>4, 29</value>
+  <data name="tabManutencao.Size" type="System.Drawing.Size, System.Drawing">
+    <value>588, 570</value>
   </data>
-  <data name="tabUtilidades.Size" type="System.Drawing.Size, System.Drawing">
-    <value>742, 527</value>
-  </data>
-  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="tabUtilidades.TabIndex" type="System.Int32, mscorlib">
-    <value>5</value>
-  </data>
-  <data name="tabUtilidades.Text" xml:space="preserve">
-    <value>Utilidades</value>
-  </data>
-  <data name="tabParametros.Location" type="System.Drawing.Point, System.Drawing">
-    <value>4, 29</value>
-  </data>
-  <data name="tabParametros.Size" type="System.Drawing.Size, System.Drawing">
-    <value>742, 527</value>
-  </data>
-  <data name="tabParametros.TabIndex" type="System.Int32, mscorlib">
-    <value>6</value>
-  </data>
-  <data name="tabParametros.Text" xml:space="preserve">
-    <value>Parametros</value>
+  <data name="tabManutencao.Text" xml:space="preserve">
+    <value>Manutenção</value>
   </data>
   <data name="tabLog.Font" type="System.Drawing.Font, System.Drawing">
     <value>Arial, 11.25pt, style=Bold</value>
@@ -186,13 +167,13 @@
     <value>4, 29</value>
   </data>
   <data name="tabLog.Size" type="System.Drawing.Size, System.Drawing">
-    <value>742, 527</value>
+    <value>588, 570</value>
   </data>
   <data name="tabControlPrincipal.Size" type="System.Drawing.Size, System.Drawing">
-    <value>750, 560</value>
+    <value>663, 603</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>750, 560</value>
+    <value>663, 603</value>
   </data>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>

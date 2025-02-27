@@ -123,7 +123,10 @@ namespace BlackSync.Forms
 
         private async void btnMigrar_Click(object sender, EventArgs e)
         {
-            LogService.RegistrarLog("INFO", $"🔄 Limpando o Log Verificação");
+            LogService.RegistrarLog(
+                "INFO", 
+                $"🔄 Limpando o Log Verificação"
+            );
             txtLog.Clear();
             pbMigracao.Value = 0;
 

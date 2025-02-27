@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Odbc;
+using System.Data.Odbc; 
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -30,13 +30,23 @@ namespace BlackSync.Services
                 using (var conn = new MySqlConnection(connectionString))
                 {
                     conn.Open();
-                    MessageBox.Show("Conexão com MySQL bem-sucedida!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show(
+                        "Conexão com MySQL bem-sucedida!", 
+                        "Sucesso", 
+                        MessageBoxButtons.OK, 
+                        MessageBoxIcon.Information
+                    );
                     return true;
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao conectar ao MySQL: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    $"Erro ao conectar ao MySQL: {ex.Message}", 
+                    "Erro", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Error
+                );
                 return false;
             }
         }
@@ -79,7 +89,12 @@ namespace BlackSync.Services
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao obter tabelas do MySQL: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    $"Erro ao obter tabelas do MySQL: {ex.Message}", 
+                    "Erro", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Error
+                );
             }
 
             return tabelas;
@@ -100,10 +115,10 @@ namespace BlackSync.Services
 
                     // 🔹 Força a verificação do banco de dados correto
                     string query = $@"
-                SELECT COLUMN_NAME, DATA_TYPE 
-                FROM INFORMATION_SCHEMA.COLUMNS 
-                WHERE TABLE_SCHEMA = '{_banco}' 
-                AND TABLE_NAME COLLATE utf8_general_ci = '{tabela.ToLower()}'";
+                        SELECT COLUMN_NAME, DATA_TYPE 
+                        FROM INFORMATION_SCHEMA.COLUMNS 
+                        WHERE TABLE_SCHEMA = '{_banco}' 
+                        AND TABLE_NAME COLLATE utf8_general_ci = '{tabela.ToLower()}'";
 
                     using (var cmd = new MySqlCommand(query, conn))
                     using (var reader = cmd.ExecuteReader())
@@ -120,7 +135,12 @@ namespace BlackSync.Services
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao obter estrutura da tabela {tabela} no MySQL: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    $"Erro ao obter estrutura da tabela {tabela} no MySQL: {ex.Message}", 
+                    "Erro", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Error
+                );
             }
 
             return estrutura;
@@ -142,7 +162,12 @@ namespace BlackSync.Services
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao executar script no MySQL: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    $"Erro ao executar script no MySQL: {ex.Message}", 
+                    "Erro", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Error
+                );
             }
         }
 
@@ -166,7 +191,12 @@ namespace BlackSync.Services
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao verificar dados na tabela {tabela}: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    $"Erro ao verificar dados na tabela {tabela}: {ex.Message}", 
+                    "Erro", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Error
+                );
                 return false; // Se der erro, assume que a tabela está vazia para evitar problemas.
             }
 
@@ -190,7 +220,12 @@ namespace BlackSync.Services
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao truncar a tabela {tabela}: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    $"Erro ao truncar a tabela {tabela}: {ex.Message}", 
+                    "Erro", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Error
+                );
             }
         }
 
@@ -205,7 +240,10 @@ namespace BlackSync.Services
                     conn.Open();
                     string query = $"SELECT * FROM \"{tabela}\"";
 
-                    Console.WriteLine($"🔍 Executando consulta: {query}"); // Log para depuração
+                    LogService.RegistrarLog(
+                        "INFO",
+                        $"🔍 Executando consulta: {query}"
+                    );
 
                     using (var cmd = new MySqlCommand(query, conn))
                     using (var adapter = new MySqlDataAdapter(cmd))
@@ -216,7 +254,12 @@ namespace BlackSync.Services
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao obter dados da tabela {tabela} no Firebird: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    $"Erro ao obter dados da tabela {tabela} no Firebird: {ex.Message}", 
+                    "Erro", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Error
+                );
             }
 
             return dt;
@@ -232,8 +275,8 @@ namespace BlackSync.Services
                 {
                     conn.Open();
                     string query = $@"
-                SELECT RDB$FIELD_NAME FROM RDB$RELATION_FIELDS 
-                WHERE RDB$RELATION_NAME = '{tabela.ToUpper()}'";
+                        SELECT RDB$FIELD_NAME FROM RDB$RELATION_FIELDS 
+                        WHERE RDB$RELATION_NAME = '{tabela.ToUpper()}'";
 
                     using (var cmd = new MySqlCommand(query, conn))
                     using (var reader = cmd.ExecuteReader())
@@ -247,7 +290,12 @@ namespace BlackSync.Services
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao obter colunas da tabela {tabela}: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    $"Erro ao obter colunas da tabela {tabela}: {ex.Message}", 
+                    "Erro", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Error
+                );
             }
 
             return colunas;
@@ -276,7 +324,12 @@ namespace BlackSync.Services
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao obter códigos existentes da tabela {tabela}: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    $"Erro ao obter códigos existentes da tabela {tabela}: {ex.Message}", 
+                    "Erro", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Error
+                );
             }
 
             return codigosExistentes;
@@ -288,14 +341,22 @@ namespace BlackSync.Services
             {
                 if (dados.Rows.Count == 0)
                 {
-                    LogService.RegistrarLog("INFO", $"⚠️ Nenhum dado para inserir na tabela {tabela}.");
+                    LogService.RegistrarLog(
+                        "INFO", 
+                        $"⚠️ Nenhum dado para inserir na tabela {tabela}."
+                    );
+
                     return;
                 }
 
                 using (var conn = new MySqlConnection(connectionString))
                 {
                     conn.Open();
-                    LogService.RegistrarLog("INFO", $"✅ Iniciando inserção de {dados.Rows.Count} registros na tabela {tabela} no MySQL.");
+                    
+                    LogService.RegistrarLog(
+                        "INFO", 
+                        $"✅ Iniciando inserção de {dados.Rows.Count} registros na tabela {tabela} no MySQL."
+                    );
 
                     string tabelaMySQL = tabela.ToLower();
                     var estruturaTabela = ObterEstruturaTabela(tabelaMySQL);
@@ -406,25 +467,6 @@ namespace BlackSync.Services
             }
         }
 
-        /// <summary>
-        /// Método para inserir um lote no banco de dados
-        /// </summary>
-        //private void InserirLoteNoBanco(string tabela, List<string> colunasValidas, List<string> colunasExtrasMySQL, List<string> batchInserts, MySqlConnection conn)
-        //{
-        //    try
-        //    {
-        //        string query = $"INSERT INTO `{tabela}` ({string.Join(", ", colunasValidas.Concat(colunasExtrasMySQL))}) VALUES {string.Join(", ", batchInserts)};";
-        //        using (var cmd = new MySqlCommand(query, conn))
-        //        {
-        //            cmd.ExecuteNonQuery();
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        LogService.RegistrarLog("ERROR", $"❌ Erro ao inserir lote na tabela {tabela}: {ex.Message}");
-        //    }
-        //}
-
         private void InserirLoteNoBanco(string tabela, List<string> colunasValidas, List<string> colunasExtrasMySQL, List<string> batchInserts, MySqlConnection conn)
         {
             try
@@ -500,7 +542,11 @@ namespace BlackSync.Services
             {
                 if (!ColunaExiste(tabela, "Enviado"))
                 {
-                    Console.WriteLine($"⚠️ A coluna 'Enviado' não existe na tabela {tabela}. Nenhuma atualização foi feita.");
+                    LogService.RegistrarLog(
+                        "INFO",
+                        $"⚠️ A coluna 'Enviado' não existe na tabela {tabela}. Nenhuma atualização foi feita."
+                    );
+
                     return;
                 }
 
@@ -512,14 +558,279 @@ namespace BlackSync.Services
                     using (var cmd = new MySqlCommand(query, conn))
                     {
                         int registrosAtualizados = cmd.ExecuteNonQuery();
-                        Console.WriteLine($"✅ {registrosAtualizados} registros foram marcados como 'Enviado' na tabela {tabela} do MySQL.");
+
+                        LogService.RegistrarLog(
+                            "SUCCESS",
+                            $"✅ {registrosAtualizados} registros foram marcados como 'Enviado' na tabela {tabela} do MySQL."
+                        );
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao atualizar coluna 'Enviado' na tabela {tabela} no MySQL: {ex.Message}",
-                    "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    $"Erro ao atualizar coluna 'Enviado' na tabela {tabela} no MySQL: {ex.Message}",
+                    "Erro", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Error
+                );
+            }
+        }
+
+        public void ReabrirMovimentoMySQL(string tabela, DateTime dataInicio, DateTime dataFim)
+        {
+            try
+            {
+                using (var conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    string colunaData = tabela switch
+                    {
+                        "baixapagar" => "dtlanca",
+                        "baixareceber" => "dtlanca",
+                        "contacartao" => "datavenda",
+                        "pagar" => "dtlanca",
+                        "receber" => "dtlanca",
+                        "abrecaixa" => "dataabre",
+                        "caixa" => "data",
+                        "notafiscal" => "dtemissao",
+                        "pedidosvenda" => "data",
+                        "movestoque" => "data",
+                        "nfentrada" => "dtlanca",
+                        _ => null
+                    };
+
+                    string query;
+
+                    // Tratamento para tabelas que usam IN (SELECT ...)
+                    if (tabela == "itensnf")
+                    {
+                        query = $@"
+                        UPDATE {tabela}
+                        SET enviado = '0'
+                        WHERE nf IN (SELECT nf FROM notafiscal WHERE dtemissao BETWEEN @DataInicio AND @DataFim)";
+                    }
+                    else if (tabela == "itenspedidovenda")
+                    {
+                        query = $@"
+                        UPDATE {tabela}
+                        SET enviado = '0'
+                        WHERE documento IN (SELECT documento FROM pedidosvenda WHERE data BETWEEN @DataInicio AND @DataFim)";
+                    }
+                    else if (tabela == "itemnfentrada")
+                    {
+                        query = $@"
+                        UPDATE {tabela}
+                        SET enviado = '0'
+                        WHERE documento IN (SELECT documento FROM nfentrada WHERE dtlanca BETWEEN @DataInicio AND @DataFim)";
+                    }
+                    else if (colunaData != null)
+                    {
+                        query = $@"
+                        UPDATE {tabela}
+                        SET enviado = '0'
+                        WHERE {colunaData} BETWEEN @DataInicio AND @DataFim";
+                    }
+                    else
+                    {
+                        LogService.RegistrarLog(
+                            "ERROR",
+                            $"⚠️ Tabela {tabela} não possui uma coluna de data válida definida."
+                        );
+
+                        return;
+                    }
+
+                    using (var cmd = new MySqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@DataInicio", dataInicio.Date);
+                        cmd.Parameters.AddWithValue("@DataFim", dataFim.Date);
+                        int linhasAfetadas = cmd.ExecuteNonQuery();
+
+                        LogService.RegistrarLog(
+                            "INFO", 
+                            $"🔄 {linhasAfetadas} registros reabertos na tabela {tabela} (MySQL)."
+                        );
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogService.RegistrarLog(
+                    "ERROR", 
+                    $"❌ Erro ao reabrir movimento na tabela {tabela} (MySQL): {ex.Message}"
+                );
+            }
+        }
+
+        public void FecharMovimentoMySQL(string tabela, DateTime dataInicio, DateTime dataFim)
+        {
+            try
+            {
+                using (var conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    string colunaData = tabela switch
+                    {
+                        "baixapagar" => "dtlanca",
+                        "baixareceber" => "dtlanca",
+                        "contacartao" => "datavenda",
+                        "pagar" => "dtlanca",
+                        "receber" => "dtlanca",
+                        "abrecaixa" => "dataabre",
+                        "caixa" => "data",
+                        "notafiscal" => "dtemissao",
+                        "pedidosvenda" => "data",
+                        "movestoque" => "data",
+                        "nfentrada" => "dtlanca",
+                        _ => null
+                    };
+
+                    string query;
+
+                    // Tratamento para tabelas que usam IN (SELECT ...)
+                    if (tabela == "itensnf")
+                    {
+                        query = $@"
+                        UPDATE {tabela}
+                        SET enviado = '1'
+                        WHERE nf IN (SELECT nf FROM notafiscal WHERE dtemissao BETWEEN @DataInicio AND @DataFim)";
+                    }
+                    else if (tabela == "itenspedidovenda")
+                    {
+                        query = $@"
+                        UPDATE {tabela}
+                        SET enviado = '1'
+                        WHERE documento IN (SELECT documento FROM pedidosvenda WHERE data BETWEEN @DataInicio AND @DataFim)";
+                    }
+                    else if (tabela == "itemnfentrada")
+                    {
+                        query = $@"
+                        UPDATE {tabela}
+                        SET enviado = '1'
+                        WHERE documento IN (SELECT documento FROM nfentrada WHERE dtlanca BETWEEN @DataInicio AND @DataFim)";
+                    }
+                    else if (colunaData != null)
+                    {
+                        query = $@"
+                        UPDATE {tabela}
+                        SET enviado = '1'
+                        WHERE {colunaData} BETWEEN @DataInicio AND @DataFim";
+                    }
+                    else
+                    {
+                        LogService.RegistrarLog(
+                            "ERROR",
+                            $"⚠️ Tabela {tabela} não possui uma coluna de data válida definida."
+                        );
+
+                        return;
+                    }
+
+                    using (var cmd = new MySqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@DataInicio", dataInicio.Date);
+                        cmd.Parameters.AddWithValue("@DataFim", dataFim.Date);
+                        int linhasAfetadas = cmd.ExecuteNonQuery();
+
+                        LogService.RegistrarLog(
+                            "INFO",
+                            $"🔄 {linhasAfetadas} registros reabertos na tabela {tabela} (MySQL)."
+                        );
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogService.RegistrarLog(
+                    "ERROR",
+                    $"❌ Erro ao reabrir movimento na tabela {tabela} (MySQL): {ex.Message}"
+                );
+            }
+        }
+
+        public void ExcluirMovimentoMySQL(string tabela, DateTime dataInicio, DateTime dataFim)
+        {
+            try
+            {
+                using (var conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    string colunaData = tabela switch
+                    {
+                        "baixapagar" => "dtlanca",
+                        "baixareceber" => "dtlanca",
+                        "contacartao" => "datavenda",
+                        "pagar" => "dtlanca",
+                        "receber" => "dtlanca",
+                        "abrecaixa" => "dataabre",
+                        "caixa" => "data",
+                        "notafiscal" => "dtemissao",
+                        "pedidosvenda" => "data",
+                        "movestoque" => "data",
+                        "nfentrada" => "dtlanca",
+                        _ => null
+                    };
+
+                    string query;
+
+                    // Tratamento para tabelas que usam IN (SELECT ...)
+                    if (tabela == "itensnf")
+                    {
+                        query = $@"
+                        delete from {tabela}
+                        WHERE nf IN (SELECT nf FROM notafiscal WHERE dtemissao BETWEEN @DataInicio AND @DataFim)";
+                    }
+                    else if (tabela == "itenspedidovenda")
+                    {
+                        query = $@"
+                        delete from {tabela}
+                        WHERE documento IN (SELECT documento FROM pedidosvenda WHERE data BETWEEN @DataInicio AND @DataFim)";
+                    }
+                    else if (tabela == "itemnfentrada")
+                    {
+                        query = $@"
+                        delete from {tabela}
+                        WHERE documento IN (SELECT documento FROM nfentrada WHERE dtlanca BETWEEN @DataInicio AND @DataFim)";
+                    }
+                    else if (colunaData != null)
+                    {
+                        query = $@"
+                        delete from {tabela}
+                        WHERE {colunaData} BETWEEN @DataInicio AND @DataFim";
+                    }
+                    else
+                    {
+                        LogService.RegistrarLog(
+                            "ERROR",
+                            $"⚠️ Tabela {tabela} não possui uma coluna de data válida definida."
+                        );
+
+                        return;
+                    }
+
+                    using (var cmd = new MySqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@DataInicio", dataInicio.Date);
+                        cmd.Parameters.AddWithValue("@DataFim", dataFim.Date);
+                        int linhasAfetadas = cmd.ExecuteNonQuery();
+
+                        LogService.RegistrarLog(
+                            "INFO",
+                            $"🔄 {linhasAfetadas} registros excluídos na tabela {tabela} (MySQL)."
+                        );
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogService.RegistrarLog(
+                    "ERROR",
+                    $"❌ Erro ao excluir os movimento na tabela {tabela} (MySQL): {ex.Message}"
+                );
             }
         }
     }

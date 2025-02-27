@@ -311,5 +311,285 @@ namespace BlackSync.Services
             }
         }
 
+        public void ReabrirMovimentoFirebird(string tabela, DateTime dataInicio, DateTime dataFim)
+        {
+            try
+            {
+                using (var conn = new OdbcConnection(connectionString))
+                {
+                    conn.Open();
+
+                    string colunaData = tabela switch
+                    {
+                        "baixapagar" => "dtlanca",
+                        "baixareceber" => "dtlanca",
+                        "contacartao" => "datavenda",
+                        "pagar" => "dtlanca",
+                        "receber" => "dtlanca",
+                        "abrecaixa" => "dataabre",
+                        "caixa" => "data",
+                        "notafiscal" => "dtemissao",
+                        "pedidosvenda" => "data",
+                        "movestoque" => "data",
+                        "nfentrada" => "dtlanca",
+                        _ => null
+                    };
+
+                    string query;
+
+                    // Tratamento para tabelas que usam IN (SELECT ...)
+                    if (tabela == "itensnf")
+                    {
+                        query = $@"
+                        UPDATE {tabela}
+                        SET enviado = '0'
+                        WHERE nf IN (SELECT nf FROM notafiscal WHERE dtemissao BETWEEN ? AND ?)";
+                    }
+                    else if (tabela == "itenspedidovenda")
+                    {
+                        query = $@"
+                        UPDATE {tabela}
+                        SET enviado = '0'
+                        WHERE documento IN (SELECT documento FROM pedidosvenda WHERE data BETWEEN ? AND ?)";
+                    }
+                    else if (tabela == "itemnfentrada")
+                    {
+                        query = $@"
+                        UPDATE {tabela}
+                        SET enviado = '0'
+                        WHERE documento IN (SELECT documento FROM nfentrada WHERE dtlanca BETWEEN ? AND ?)";
+                    }
+                    else if (colunaData != null)
+                    {
+                        query = $@"
+                        UPDATE {tabela}
+                        SET enviado = '0'
+                        WHERE {colunaData} BETWEEN ? AND ?";
+                    }
+                    else
+                    {
+                        LogService.RegistrarLog(
+                            "ERROR", 
+                            $"⚠️ Tabela {tabela} não possui uma coluna de data válida definida."
+                        );
+
+                        return;
+                    }
+
+                    using (var cmd = new OdbcCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("?", dataInicio.Date);
+                        cmd.Parameters.AddWithValue("?", dataFim.Date);
+
+                        int linhasAfetadas = cmd.ExecuteNonQuery();
+                        LogService.RegistrarLog(
+                            "INFO", 
+                            $"🔄 {linhasAfetadas} registros reabertos na tabela {tabela} (Firebird)."
+                        );
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogService.RegistrarLog("ERROR", $"❌ Erro ao reabrir movimento na tabela {tabela} (Firebird): {ex.Message}");
+            }
+        }
+
+        public void FecharMovimentoFirebird(string tabela, DateTime dataInicio, DateTime dataFim)
+        {
+            try
+            {
+                using (var conn = new OdbcConnection(connectionString))
+                {
+                    conn.Open();
+
+                    string colunaData = tabela switch
+                    {
+                        "baixapagar" => "dtlanca",
+                        "baixareceber" => "dtlanca",
+                        "contacartao" => "datavenda",
+                        "pagar" => "dtlanca",
+                        "receber" => "dtlanca",
+                        "abrecaixa" => "dataabre",
+                        "caixa" => "data",
+                        "notafiscal" => "dtemissao",
+                        "pedidosvenda" => "data",
+                        "movestoque" => "data",
+                        "nfentrada" => "dtlanca",
+                        _ => null
+                    };
+
+                    string query;
+
+                    // Tratamento para tabelas que usam IN (SELECT ...)
+                    if (tabela == "itensnf")
+                    {
+                        query = $@"
+                UPDATE {tabela}
+                SET enviado = '1'
+                WHERE nf IN (SELECT nf FROM notafiscal WHERE dtemissao BETWEEN ? AND ?)";
+                    }
+                    else if (tabela == "itenspedidovenda")
+                    {
+                        query = $@"
+                UPDATE {tabela}
+                SET enviado = '1'
+                WHERE documento IN (SELECT documento FROM pedidosvenda WHERE data BETWEEN ? AND ?)";
+                    }
+                    else if (tabela == "itemnfentrada")
+                    {
+                        query = $@"
+                UPDATE {tabela}
+                SET enviado = '1'
+                WHERE documento IN (SELECT documento FROM nfentrada WHERE dtlanca BETWEEN ? AND ?)";
+                    }
+                    else if (colunaData != null)
+                    {
+                        query = $@"
+                UPDATE {tabela}
+                SET enviado = '1'
+                WHERE {colunaData} BETWEEN ? AND ?";
+                    }
+                    else
+                    {
+                        LogService.RegistrarLog(
+                            "ERROR",
+                            $"⚠️ Tabela {tabela} não possui uma coluna de data válida definida."
+                        );
+
+                        return;
+                    }
+
+                    using (var cmd = new OdbcCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("?", dataInicio.Date);
+                        cmd.Parameters.AddWithValue("?", dataFim.Date);
+
+                        int linhasAfetadas = cmd.ExecuteNonQuery();
+                        LogService.RegistrarLog(
+                            "INFO",
+                            $"🔄 {linhasAfetadas} registros reabertos na tabela {tabela} (Firebird)."
+                        );
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogService.RegistrarLog("ERROR", $"❌ Erro ao reabrir movimento na tabela {tabela} (Firebird): {ex.Message}");
+            }
+        }
+
+        public void ExcluirMovimentoFirebird(string tabela, DateTime dataInicio, DateTime dataFim)
+        {
+            try
+            {
+                using (var conn = new OdbcConnection(connectionString))
+                {
+                    conn.Open();
+
+                    string colunaData = tabela switch
+                    {
+                        "baixapagar" => "dtlanca",
+                        "baixareceber" => "dtlanca",
+                        "contacartao" => "datavenda",
+                        "pagar" => "dtlanca",
+                        "receber" => "dtlanca",
+                        "abrecaixa" => "dataabre",
+                        "caixa" => "data",
+                        "notafiscal" => "dtemissao",
+                        "pedidosvenda" => "data",
+                        "movestoque" => "data",
+                        "nfentrada" => "dtlanca",
+                        _ => null
+                    };
+
+                    string query;
+
+                    // Tratamento para tabelas que usam IN (SELECT ...)
+                    if (tabela == "itensnf")
+                    {
+                        query = $@"
+                        delete from {tabela}
+                        WHERE nf IN (SELECT nf FROM notafiscal WHERE dtemissao BETWEEN ? AND ?)";
+                    }
+                    else if (tabela == "itenspedidovenda")
+                    {
+                        query = $@"
+                        delete from {tabela}
+                        WHERE documento IN (SELECT documento FROM pedidosvenda WHERE data BETWEEN ? AND ?)";
+                    }
+                    else if (tabela == "itemnfentrada")
+                    {
+                        query = $@"
+                        delete from {tabela}
+                        WHERE documento IN (SELECT documento FROM nfentrada WHERE dtlanca BETWEEN ? AND ?)";
+                    }
+                    else if (colunaData != null)
+                    {
+                        query = $@"
+                        delete from {tabela}
+                        WHERE {colunaData} BETWEEN ? AND ?";
+                    }
+                    else
+                    {
+                        LogService.RegistrarLog(
+                            "ERROR",
+                            $"⚠️ Tabela {tabela} não possui uma coluna de data válida definida."
+                        );
+
+                        return;
+                    }
+
+                    using (var cmd = new OdbcCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("?", dataInicio.Date);
+                        cmd.Parameters.AddWithValue("?", dataFim.Date);
+
+                        int linhasAfetadas = cmd.ExecuteNonQuery();
+                        LogService.RegistrarLog(
+                            "INFO",
+                            $"🔄 {linhasAfetadas} registros excluídos na tabela {tabela} (Firebird)."
+                        );
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogService.RegistrarLog("ERROR", $"❌ Erro ao excluir os movimentos na tabela {tabela} (Firebird): {ex.Message}");
+            }
+        }
+
+        public void AtualizarFilialFirebird(string tabela, int xFilial)
+        {
+            try
+            {
+                using (var conn = new OdbcConnection(connectionString))
+                {
+                    conn.Open();
+
+                    string query = $@"
+                    UPDATE {tabela}
+                    SET filial = ?
+                    WHERE filial IS NULL OR filial != ?";
+
+                    using (var cmd = new OdbcCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@filial", xFilial);
+                        cmd.Parameters.AddWithValue("@filialAtual", xFilial); // Para evitar atualização desnecessária.
+
+                        int linhasAfetadas = cmd.ExecuteNonQuery();
+
+                        LogService.RegistrarLog(
+                            "INFO",
+                            $"🔄 {linhasAfetadas} registros atualizados na tabela {tabela} (Firebird)."
+                        );
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogService.RegistrarLog("ERROR", $"❌ Erro ao atualizar a filial na tabela {tabela} (Firebird): {ex.Message}");
+            }
+        }
     }
 }

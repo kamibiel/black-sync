@@ -34,9 +34,8 @@
             tabVerificacao = new TabPage();
             tabEstrutura = new TabPage();
             tabMigracao = new TabPage();
+            tabManutencao = new TabPage();
             tabLog = new TabPage();
-            tabUtilidades = new TabPage();
-            tabParametros = new TabPage();
             tabControlPrincipal.SuspendLayout();
             SuspendLayout();
             // 
@@ -47,8 +46,7 @@
             tabControlPrincipal.Controls.Add(tabVerificacao);
             tabControlPrincipal.Controls.Add(tabEstrutura);
             tabControlPrincipal.Controls.Add(tabMigracao);
-            tabControlPrincipal.Controls.Add(tabUtilidades);
-            tabControlPrincipal.Controls.Add(tabParametros);
+            tabControlPrincipal.Controls.Add(tabManutencao);
             tabControlPrincipal.Controls.Add(tabLog);
             tabControlPrincipal.Multiline = true;
             tabControlPrincipal.Name = "tabControlPrincipal";
@@ -82,23 +80,17 @@
             tabMigracao.BackColor = Color.DimGray;
             tabMigracao.Name = "tabMigracao";
             // 
+            // tabManutencao
+            // 
+            resources.ApplyResources(tabManutencao, "tabManutencao");
+            tabManutencao.BackColor = Color.DimGray;
+            tabManutencao.Name = "tabManutencao";
+            // 
             // tabLog
             // 
             resources.ApplyResources(tabLog, "tabLog");
             tabLog.BackColor = Color.DimGray;
             tabLog.Name = "tabLog";
-            // 
-            // tabUtilidades
-            // 
-            resources.ApplyResources(tabUtilidades, "tabUtilidades");
-            tabUtilidades.BackColor = Color.DimGray;
-            tabUtilidades.Name = "tabUtilidades";
-            // 
-            // tabParametros
-            // 
-            resources.ApplyResources(tabParametros, "tabParametros");
-            tabParametros.BackColor = Color.DimGray;
-            tabParametros.Name = "tabParametros";
             // 
             // FormPrincipal
             // 
@@ -122,7 +114,6 @@
         private TabPage tabLog;
         private TabPage tabVerificacao;
         private TabPage tabEstrutura;
-        private TabPage tabUtilidades;
-        private TabPage tabParametros;
+        private TabPage tabManutencao;
     }
 }

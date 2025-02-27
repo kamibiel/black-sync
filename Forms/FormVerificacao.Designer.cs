@@ -28,83 +28,51 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
             gridFirebirdTables = new DataGridView();
-            lbFirebird = new Label();
-            lbMySQL = new Label();
             gridMySQLTables = new DataGridView();
             btnVerificarTabelas = new Button();
             gridDiferencas = new DataGridView();
             btnGerarScripts = new Button();
             progressBarScripts = new ProgressBar();
+            gbFirebird = new GroupBox();
+            gbMySQL = new GroupBox();
+            dataGridView1 = new DataGridView();
             ((System.ComponentModel.ISupportInitialize)gridFirebirdTables).BeginInit();
             ((System.ComponentModel.ISupportInitialize)gridMySQLTables).BeginInit();
             ((System.ComponentModel.ISupportInitialize)gridDiferencas).BeginInit();
+            gbFirebird.SuspendLayout();
+            gbMySQL.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
             // 
             // gridFirebirdTables
             // 
             gridFirebirdTables.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = SystemColors.Control;
-            dataGridViewCellStyle1.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
-            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
-            gridFirebirdTables.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             gridFirebirdTables.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            gridFirebirdTables.Location = new Point(37, 52);
+            gridFirebirdTables.Location = new Point(6, 18);
             gridFirebirdTables.Name = "gridFirebirdTables";
-            gridFirebirdTables.Size = new Size(267, 262);
+            gridFirebirdTables.Size = new Size(172, 199);
             gridFirebirdTables.TabIndex = 1;
-            // 
-            // lbFirebird
-            // 
-            lbFirebird.AutoSize = true;
-            lbFirebird.Location = new Point(132, 21);
-            lbFirebird.Name = "lbFirebird";
-            lbFirebird.Size = new Size(68, 19);
-            lbFirebird.TabIndex = 1;
-            lbFirebird.Text = "Firebird";
-            // 
-            // lbMySQL
-            // 
-            lbMySQL.AutoSize = true;
-            lbMySQL.Location = new Point(426, 21);
-            lbMySQL.Name = "lbMySQL";
-            lbMySQL.Size = new Size(64, 19);
-            lbMySQL.TabIndex = 3;
-            lbMySQL.Text = "MySQL";
             // 
             // gridMySQLTables
             // 
             gridMySQLTables.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = SystemColors.Control;
-            dataGridViewCellStyle2.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
-            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
-            gridMySQLTables.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             gridMySQLTables.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            gridMySQLTables.Location = new Point(331, 52);
+            gridMySQLTables.Location = new Point(6, 18);
             gridMySQLTables.Name = "gridMySQLTables";
-            gridMySQLTables.Size = new Size(267, 262);
+            gridMySQLTables.Size = new Size(172, 199);
             gridMySQLTables.TabIndex = 2;
             // 
             // btnVerificarTabelas
             // 
-            btnVerificarTabelas.BackColor = Color.DarkViolet;
-            btnVerificarTabelas.FlatAppearance.BorderSize = 0;
+            btnVerificarTabelas.BackColor = Color.DimGray;
             btnVerificarTabelas.FlatStyle = FlatStyle.Flat;
-            btnVerificarTabelas.Location = new Point(226, 320);
+            btnVerificarTabelas.Font = new Font("Arial", 9.75F);
+            btnVerificarTabelas.Location = new Point(12, 391);
             btnVerificarTabelas.Name = "btnVerificarTabelas";
-            btnVerificarTabelas.Size = new Size(185, 41);
+            btnVerificarTabelas.Size = new Size(182, 41);
             btnVerificarTabelas.TabIndex = 3;
             btnVerificarTabelas.Text = "Verificar tabelas";
             btnVerificarTabelas.UseVisualStyleBackColor = false;
@@ -113,36 +81,36 @@
             // gridDiferencas
             // 
             gridDiferencas.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = SystemColors.Control;
-            dataGridViewCellStyle3.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
-            dataGridViewCellStyle3.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
-            gridDiferencas.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle5.BackColor = SystemColors.Control;
+            dataGridViewCellStyle5.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            dataGridViewCellStyle5.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle5.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = DataGridViewTriState.True;
+            gridDiferencas.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
             gridDiferencas.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = SystemColors.Window;
-            dataGridViewCellStyle4.Font = new Font("Segoe UI", 10F);
-            dataGridViewCellStyle4.ForeColor = SystemColors.ControlText;
-            dataGridViewCellStyle4.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = DataGridViewTriState.False;
-            gridDiferencas.DefaultCellStyle = dataGridViewCellStyle4;
-            gridDiferencas.Location = new Point(36, 367);
+            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle6.BackColor = SystemColors.Window;
+            dataGridViewCellStyle6.Font = new Font("Segoe UI", 10F);
+            dataGridViewCellStyle6.ForeColor = SystemColors.ControlText;
+            dataGridViewCellStyle6.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle6.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = DataGridViewTriState.False;
+            gridDiferencas.DefaultCellStyle = dataGridViewCellStyle6;
+            gridDiferencas.Location = new Point(12, 259);
             gridDiferencas.Name = "gridDiferencas";
-            gridDiferencas.Size = new Size(300, 126);
+            gridDiferencas.Size = new Size(376, 126);
             gridDiferencas.TabIndex = 4;
             // 
             // btnGerarScripts
             // 
             btnGerarScripts.FlatAppearance.BorderColor = Color.Red;
-            btnGerarScripts.FlatAppearance.BorderSize = 2;
             btnGerarScripts.FlatStyle = FlatStyle.Flat;
-            btnGerarScripts.Location = new Point(357, 402);
+            btnGerarScripts.Font = new Font("Arial", 9.75F);
+            btnGerarScripts.Location = new Point(206, 391);
             btnGerarScripts.Name = "btnGerarScripts";
-            btnGerarScripts.Size = new Size(133, 51);
+            btnGerarScripts.Size = new Size(182, 41);
             btnGerarScripts.TabIndex = 4;
             btnGerarScripts.Text = "Gerar Scripts";
             btnGerarScripts.UseVisualStyleBackColor = true;
@@ -150,27 +118,55 @@
             // 
             // progressBarScripts
             // 
-            progressBarScripts.Location = new Point(37, 497);
+            progressBarScripts.Location = new Point(12, 241);
             progressBarScripts.Name = "progressBarScripts";
-            progressBarScripts.Size = new Size(561, 12);
+            progressBarScripts.Size = new Size(374, 12);
             progressBarScripts.Style = ProgressBarStyle.Marquee;
             progressBarScripts.TabIndex = 5;
             progressBarScripts.Visible = false;
+            // 
+            // gbFirebird
+            // 
+            gbFirebird.Controls.Add(gridFirebirdTables);
+            gbFirebird.Location = new Point(12, 12);
+            gbFirebird.Name = "gbFirebird";
+            gbFirebird.Size = new Size(184, 223);
+            gbFirebird.TabIndex = 6;
+            gbFirebird.TabStop = false;
+            gbFirebird.Text = "Tabelas Firebird";
+            // 
+            // gbMySQL
+            // 
+            gbMySQL.Controls.Add(dataGridView1);
+            gbMySQL.Controls.Add(gridMySQLTables);
+            gbMySQL.Location = new Point(202, 12);
+            gbMySQL.Name = "gbMySQL";
+            gbMySQL.Size = new Size(184, 223);
+            gbMySQL.TabIndex = 7;
+            gbMySQL.TabStop = false;
+            gbMySQL.Text = "Tabelas MySQL";
+            // 
+            // dataGridView1
+            // 
+            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+            dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridView1.Location = new Point(6, 18);
+            dataGridView1.Name = "dataGridView1";
+            dataGridView1.Size = new Size(172, 199);
+            dataGridView1.TabIndex = 1;
             // 
             // FormVerificacao
             // 
             AutoScaleDimensions = new SizeF(10F, 19F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.DimGray;
-            ClientSize = new Size(630, 519);
+            ClientSize = new Size(405, 450);
+            Controls.Add(gbMySQL);
+            Controls.Add(gbFirebird);
             Controls.Add(progressBarScripts);
             Controls.Add(btnGerarScripts);
             Controls.Add(gridDiferencas);
             Controls.Add(btnVerificarTabelas);
-            Controls.Add(lbMySQL);
-            Controls.Add(gridMySQLTables);
-            Controls.Add(lbFirebird);
-            Controls.Add(gridFirebirdTables);
             Font = new Font("Arial", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
             Margin = new Padding(4);
             Name = "FormVerificacao";
@@ -178,19 +174,22 @@
             ((System.ComponentModel.ISupportInitialize)gridFirebirdTables).EndInit();
             ((System.ComponentModel.ISupportInitialize)gridMySQLTables).EndInit();
             ((System.ComponentModel.ISupportInitialize)gridDiferencas).EndInit();
+            gbFirebird.ResumeLayout(false);
+            gbMySQL.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
 
         private DataGridView gridFirebirdTables;
-        private Label lbFirebird;
-        private Label lbMySQL;
         private DataGridView gridMySQLTables;
         private Button btnVerificarTabelas;
         private DataGridView gridDiferencas;
         private Button btnGerarScripts;
         private ProgressBar progressBarScripts;
+        private GroupBox gbFirebird;
+        private GroupBox gbMySQL;
+        private DataGridView dataGridView1;
     }
 }
