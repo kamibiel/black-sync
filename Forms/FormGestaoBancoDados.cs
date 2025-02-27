@@ -109,7 +109,7 @@ namespace BlackSync.Forms
             return tabelasSelecionadas.Distinct().ToList();
         }
 
-        private void btnReabrirDados_Click(object sender, EventArgs e)
+        private async void btnReabrirDados_Click(object sender, EventArgs e)
         {
             try
             {
@@ -182,6 +182,12 @@ namespace BlackSync.Forms
                     $"📤 Foi selecionado o banco de dados: {bancoSelecionado}"
                 );
 
+                // Iniciar barra de progresso
+                pbGestao.Minimum = 0;
+                pbGestao.Maximum = tabelasParaAtualizarFilial.Count;
+                pbGestao.Value = 0;
+                pbGestao.Step = 1;
+
                 if (bancoSelecionado == "Firebird" || bancoSelecionado == "Ambos")
                 {
                     LogService.RegistrarLog(
@@ -189,11 +195,19 @@ namespace BlackSync.Forms
                         $"🔄 Iniciando a reabertura dos dados das tabelas: {tabelasParaReabrir} para o banco de dados: {bancoSelecionado}."
                     );
 
-                    // Executa a reabertura no Firebird
-                    foreach (string tabela in tabelasParaReabrir)
-                    {
-                        _firebirdService.ReabrirMovimentoFirebird(tabela, dataInicio, dataFim);
-                    }
+                    // Executar a atualização das tabelas de forma assíncrona
+                    await Task.Run(() => {
+                        foreach(string tabela in tabelasParaReabrir)
+                        {
+                            _firebirdService.ReabrirMovimentoFirebird(tabela, dataInicio, dataFim);
+
+                            // Atualizar a barra de progresso na UI Thread
+                            this.Invoke(new Action(() =>
+                            {
+                                pbGestao.PerformStep();
+                            }));
+                        }
+                    });
 
                     LogService.RegistrarLog(
                         "SUCCESS",
@@ -208,11 +222,18 @@ namespace BlackSync.Forms
                         $"🔄 Iniciando a reabertura dos movimentos das tabelas: {tabelasParaReabrir} para o banco de dados: {bancoSelecionado}."
                     );
 
-                    // Executa a reabertura no MySQL
-                    foreach (string tabela in tabelasParaReabrir)
-                    {
-                        _mySQLService.ReabrirMovimentoMySQL(tabela, dataInicio, dataFim);
-                    }
+                    // Executar a atualização das tabelas de forma assíncrona
+                    await Task.Run (() => {
+                        foreach(string tabela in tabelasParaReabrir)
+                        {
+                            _mySQLService.ReabrirMovimentoMySQL(tabela, dataInicio, dataFim);
+
+                            // Atualizar a barra de progresso na UI Thread
+                            this.Invoke(new Action (() => {
+                                pbGestao.PerformStep();
+                            }));
+                        }
+                    });
 
                     LogService.RegistrarLog(
                         "SUCCESS",
@@ -242,7 +263,7 @@ namespace BlackSync.Forms
             }
         }
 
-        private void btnFecharDados_Click(object sender, EventArgs e)
+        private async void btnFecharDados_Click(object sender, EventArgs e)
         {
             try
             {
@@ -310,10 +331,17 @@ namespace BlackSync.Forms
 
                 // Verifica qual banco foi selecionado
                 string bancoSelecionado = cbBanco.SelectedItem.ToString();
+
                 LogService.RegistrarLog(
                     "INFO",
                     $"📤 Foi selecionado o banco de dados: {bancoSelecionado}"
                 );
+
+                // Iniciar barra de progresso
+                pbGestao.Minimum = 0;
+                pbGestao.Maximum = tabelasParaAtualizarFilial.Count;
+                pbGestao.Value = 0;
+                pbGestao.Step = 1;                
 
                 if (bancoSelecionado == "Firebird" || bancoSelecionado == "Ambos")
                 {
@@ -322,11 +350,18 @@ namespace BlackSync.Forms
                         $"🔄 Iniciando o fechamento dos movimentos das tabelas: {tabelasParaFechar} para o banco de dados: {bancoSelecionado}."
                     );
 
-                    // Executa a reabertura no Firebird
-                    foreach (string tabela in tabelasParaFechar)
-                    {
-                        _firebirdService.FecharMovimentoFirebird(tabela, dataInicio, dataFim);
-                    }
+                    // Executar a atualização das tabelas de forma assíncrona
+                    await Task.Run(() => {
+                        foreach(string tabela in tabelasParaFechar)
+                        {
+                            _firebirdService.FecharMovimentoFirebird(tabela, dataInicio, dataFim);
+
+                            // Atualizar a barra de progresso na UI Thread
+                            this.Invoke(new Action(() => {
+                                pbGestao.PerformStep();
+                            }));
+                        }
+                    });
 
                     LogService.RegistrarLog(
                         "SUCCESS",
@@ -341,11 +376,19 @@ namespace BlackSync.Forms
                         $"🔄 Iniciando o fechamento dos movimentos das tabelas: {tabelasParaFechar} para o banco de dados: {bancoSelecionado}."
                     );
 
-                    // Executa a reabertura no MySQL
-                    foreach (string tabela in tabelasParaFechar)
-                    {
-                        _mySQLService.FecharMovimentoMySQL(tabela, dataInicio, dataFim);
-                    }
+                    // Executar a atualização das tabelas de forma assíncrona
+                    await Task.Run(() => {
+                        foreach(string tabela in tabelasParaFechar)
+                        {
+                            _mySQLService.FecharMovimentoMySQL(tabela, dataInicio, dataFim);
+
+                            // Atualizar a barra de progresso na UI Thread
+                            this.Invoke(new Action(() =>
+                            {
+                                pbGestao.PerformStep();
+                            }));
+                        }
+                    });
 
                     LogService.RegistrarLog(
                         "SUCCESS",
@@ -375,7 +418,7 @@ namespace BlackSync.Forms
             }
         }
 
-        private void btnExcluirDados_Click(object sender, EventArgs e)
+        private async Task btnExcluirDados_Click(object sender, EventArgs e)
         {
             try
             {
@@ -449,6 +492,12 @@ namespace BlackSync.Forms
                     "📤 Foi selecionado o banco de dados: {bancoSelecionado}"
                 );
 
+                // Iniciar barra de progresso
+                pbGestao.Minimum = 0;
+                pbGestao.Maximum = tabelasParaAtualizarFilial.Count;
+                pbGestao.Value = 0;
+                pbGestao.Step = 1;                
+
                 if (bancoSelecionado == "Firebird" || bancoSelecionado == "Ambos")
                 {
                     LogService.RegistrarLog(
@@ -456,11 +505,21 @@ namespace BlackSync.Forms
                         $"🔄 Iniciando a exclusão dos movimentos das tabelas: {tabelasParaExcluir} para o banco de dados: {bancoSelecionado}."
                     );
 
-                    // Executa a exclusão no Firebird
-                    foreach (string tabela in tabelasParaExcluir)
+                    // Executar a atualização das tabelas de forma assíncrona
+                    await Task.Run(() =>
                     {
-                        _firebirdService.ExcluirMovimentoFirebird(tabela, dataInicio, dataFim);
-                    }
+                        // Executa a exclusão no Firebird
+                        foreach (string tabela in tabelasParaExcluir)
+                        {
+                            _firebirdService.ExcluirMovimentoFirebird(tabela, dataInicio, dataFim);
+
+                            // Atualizar a barra de progresso na UI Thread
+                            this.Invoke(new Action(() =>
+                            {
+                                pbGestao.PerformStep();
+                            }));
+                        }
+                    });    
 
                     LogService.RegistrarLog(
                         "SUCCESS",
@@ -475,11 +534,20 @@ namespace BlackSync.Forms
                         $"🔄 Iniciando a exclusão dos movimentos das tabelas: {tabelasParaExcluir} para o banco de dados: {bancoSelecionado}."
                     );
 
-                    // Executa a exclusão no MySQL
-                    foreach (string tabela in tabelasParaExcluir)
-                    {
-                        _mySQLService.ExcluirMovimentoMySQL(tabela, dataInicio, dataFim);
-                    }
+                    await Task.Run(()=>{
+                        
+                        // Executa a exclusão no MySQL
+                        foreach(string tabela in tabelasParaExcluir)
+                        {
+                            _mySQLService.ExcluirMovimentoMySQL(tabela, dataInicio, dataFim);
+
+                            // Atualizar a barra de progresso na UI Thread
+                            this.Invoke(new Action(() =>
+                            {
+                                pbGestao.PerformStep();
+                            }));
+                        }
+                    });
 
                     LogService.RegistrarLog(
                         "SUCCESS",
