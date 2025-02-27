@@ -418,7 +418,7 @@ namespace BlackSync.Forms
             }
         }
 
-        private async Task btnExcluirDados_Click(object sender, EventArgs e)
+        private async void btnExcluirDados_Click(object sender, EventArgs e)
         {
             try
             {
