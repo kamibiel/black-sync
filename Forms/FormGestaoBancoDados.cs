@@ -184,7 +184,7 @@ namespace BlackSync.Forms
 
                 // Iniciar barra de progresso
                 pbGestao.Minimum = 0;
-                pbGestao.Maximum = tabelasParaAtualizarFilial.Count;
+                pbGestao.Maximum = tabelasParaReabrir.Count;
                 pbGestao.Value = 0;
                 pbGestao.Step = 1;
 
@@ -339,7 +339,7 @@ namespace BlackSync.Forms
 
                 // Iniciar barra de progresso
                 pbGestao.Minimum = 0;
-                pbGestao.Maximum = tabelasParaAtualizarFilial.Count;
+                pbGestao.Maximum = tabelasParaFechar.Count;
                 pbGestao.Value = 0;
                 pbGestao.Step = 1;                
 
@@ -494,7 +494,7 @@ namespace BlackSync.Forms
 
                 // Iniciar barra de progresso
                 pbGestao.Minimum = 0;
-                pbGestao.Maximum = tabelasParaAtualizarFilial.Count;
+                pbGestao.Maximum = tabelasParaExcluir.Count;
                 pbGestao.Value = 0;
                 pbGestao.Step = 1;                
 
