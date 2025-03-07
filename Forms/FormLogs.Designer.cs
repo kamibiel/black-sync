@@ -39,7 +39,7 @@
             gbLog.Font = new Font("Arial", 12F, FontStyle.Bold);
             gbLog.Location = new Point(12, 12);
             gbLog.Name = "gbLog";
-            gbLog.Size = new Size(369, 457);
+            gbLog.Size = new Size(497, 437);
             gbLog.TabIndex = 0;
             gbLog.TabStop = false;
             gbLog.Text = "Logs";
@@ -51,7 +51,7 @@
             txtLogs.Multiline = true;
             txtLogs.Name = "txtLogs";
             txtLogs.ScrollBars = ScrollBars.Vertical;
-            txtLogs.Size = new Size(357, 426);
+            txtLogs.Size = new Size(485, 406);
             txtLogs.TabIndex = 0;
             // 
             // FormLogs
@@ -59,7 +59,7 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.DimGray;
-            ClientSize = new Size(393, 481);
+            ClientSize = new Size(521, 461);
             Controls.Add(gbLog);
             Name = "FormLogs";
             Text = "FormLogs";

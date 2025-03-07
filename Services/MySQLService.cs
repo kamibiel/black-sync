@@ -833,5 +833,59 @@ namespace BlackSync.Services
                 );
             }
         }
+
+        public void AlterarDocumentoMySQL(string tabela, int xEmpresa, int yEmpresa)
+        {
+            try
+            {
+                using (var conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    Dictionary<string, string> colunasDocumento = new Dictionary<string, string>
+                    {
+                        { "baixapagar", "documento" },
+                        { "baixareceber", "documento" },
+                        { "contacartao", "documento" },
+                        { "pagar", "documento" },
+                        { "receber", "documento" },
+                        { "caixa", "pedido" },
+                        { "notafiscal", "pedido" },
+                        { "pedidosvenda", "documento" },
+                        { "itenspedidovenda", "documento" },
+                        { "movestoque", "documento" },
+                        { "nfentrada", "documento" },
+                        { "itemnfentrada", "documento" }
+                    };
+
+                    if (!colunasDocumento.ContainsKey(tabela))
+                    {
+                        LogService.RegistrarLog("ERROR", $"⚠️ Tabela {tabela} não possui uma coluna de documento definida.");
+                        return;
+                    }
+
+                    string colunaDocumento = colunasDocumento[tabela];
+
+                    string query = $@"
+                        UPDATE {tabela}
+                        SET {colunaDocumento} = REPLACE(REPLACE({colunaDocumento}, 'P{xEmpresa}', 'P{yEmpresa}'), 'F{xEmpresa}', 'F{yEmpresa}')
+                        WHERE {colunaDocumento} LIKE 'P{xEmpresa}%' OR {colunaDocumento} LIKE 'F{xEmpresa}%'";
+
+                    using (var cmd = new MySqlCommand(query, conn))
+                    {
+                        int linhasAfetadas = cmd.ExecuteNonQuery();
+                        LogService.RegistrarLog(
+                            "INFO",
+                            $"✅ {linhasAfetadas} registros alterados na tabela {tabela} (MySQL)."
+                        );
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogService.RegistrarLog("ERROR", $"❌ Erro ao alterar a numeração do documento na tabela {tabela} (MySQL): {ex.Message}");
+            }
+        }
+
     }
 }

@@ -122,25 +122,13 @@
     <value>Arial, 11.25pt, style=Bold</value>
   </data>
   <data name="tabConfig.Size" type="System.Drawing.Size, System.Drawing">
-    <value>655, 570</value>
-  </data>
-  <data name="tabVerificacao.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Arial, 12pt, style=Bold</value>
-  </data>
-  <data name="tabVerificacao.Location" type="System.Drawing.Point, System.Drawing">
-    <value>4, 29</value>
-  </data>
-  <data name="tabVerificacao.Size" type="System.Drawing.Size, System.Drawing">
-    <value>588, 570</value>
-  </data>
-  <data name="tabVerificacao.Text" xml:space="preserve">
-    <value>Tabelas</value>
+    <value>576, 628</value>
   </data>
   <data name="tabEstrutura.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Arial, 11.25pt, style=Bold</value>
+    <value>Arial, 12pt, style=Bold</value>
   </data>
   <data name="tabEstrutura.Size" type="System.Drawing.Size, System.Drawing">
-    <value>588, 570</value>
+    <value>576, 628</value>
   </data>
   <data name="tabEstrutura.Text" xml:space="preserve">
     <value>Estrutura</value>
@@ -152,10 +140,13 @@
     <value>4, 29</value>
   </data>
   <data name="tabMigracao.Size" type="System.Drawing.Size, System.Drawing">
-    <value>588, 570</value>
+    <value>576, 628</value>
+  </data>
+  <data name="tabManutencao.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Arial, 12pt, style=Bold</value>
   </data>
   <data name="tabManutencao.Size" type="System.Drawing.Size, System.Drawing">
-    <value>588, 570</value>
+    <value>576, 628</value>
   </data>
   <data name="tabManutencao.Text" xml:space="preserve">
     <value>Manutenção</value>
@@ -167,13 +158,13 @@
     <value>4, 29</value>
   </data>
   <data name="tabLog.Size" type="System.Drawing.Size, System.Drawing">
-    <value>588, 570</value>
+    <value>576, 628</value>
   </data>
   <data name="tabControlPrincipal.Size" type="System.Drawing.Size, System.Drawing">
-    <value>663, 603</value>
+    <value>584, 661</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>663, 603</value>
+    <value>584, 661</value>
   </data>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
@@ -762,6 +753,10 @@
         4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg
         4ODg4ODg4ODg4ODg4ODg4ODg4ODg4OD4ReL/AQzM/gLYed4dAAAAAElFTkSuQmCC
 </value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="$this.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>BlackSync - Migração de Dados entre MySQL e Firebird</value>

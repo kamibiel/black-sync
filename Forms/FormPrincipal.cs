@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -21,9 +22,61 @@ namespace BlackSync.Forms
         public FormPrincipal()
         {
             InitializeComponent();
-            VerificarConfiguracao();
-            CarregarFormularios();
+
+            if(VerificarConfiguracao())
+            {
+                AtualizarServicos();
+                CarregarFormularios();
+            }
+          
             this.ShowInTaskbar = true;
+        }
+
+        private bool VerificarConfiguracao()
+        {
+            if (File.Exists(confiFilePath))
+            {
+                DialogResult resultado = MessageBox.Show(
+                    "Deseja manter a configuração existente?",
+                    "Configuração Detectada",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question
+                );
+
+                // 🔹 Garante que o FormConfig seja carregado corretamente
+                FormConfig formConfig = new FormConfig(this);
+                AdicionarFormularioAba(formConfig, tabConfig);
+
+                if (resultado == DialogResult.Yes)
+                {
+                    LogService.RegistrarLog("INFO", "🔄 Carregando configuração salva...");
+                    formConfig.CarregarConfiguracao();
+                    tabControlPrincipal.SelectedTab = tabMigracao;
+                    return true;
+                }
+                else
+                {
+                    tabControlPrincipal.SelectedTab = tabConfig;
+                    return false;
+                }
+            }
+            else
+            {
+                // Se não existir config.ini, abre a aba "Configuração"
+                MessageBox.Show(
+                    "Nenhuma configuração encontrada. Por favor, configure o sistema.",
+                    "Aviso",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning
+                );
+
+                // 🔹 Agora, carrega o FormConfig para evitar que a tela fique vazia!
+                FormConfig formConfig = new FormConfig(this);
+                AdicionarFormularioAba(formConfig, tabConfig);
+
+                tabControlPrincipal.SelectedTab = tabConfig;
+                return false;
+            }
         }
 
         public MySQLService ObterMySQLService() => _mySQLService;
@@ -32,49 +85,6 @@ namespace BlackSync.Forms
         public TabControl TabControlPrincipal
         {
             get { return this.tabControlPrincipal; }
-        }
-
-        private void VerificarConfiguracao()
-        {
-            // Se o config.ini existir, perguntar ao usuário
-            if (File.Exists(confiFilePath))
-            {
-                DialogResult resultado = MessageBox.Show(
-                    "Deseja manter a configuração existente?", 
-                    "Configuração Detectada", 
-                    MessageBoxButtons.YesNo, 
-                    MessageBoxIcon.Question
-                );
-
-                // Garante que o formulário de configuração seja carregado antes da troca de aba
-                FormConfig formConfig = new FormConfig(this);
-                AdicionarFormularioAba(formConfig, tabConfig);
-
-                if (resultado == DialogResult.Yes)
-                {
-                    // Se o usuário escolher "Sim", carrega e atualiza os serviços apenas uma vez
-                    LogService.RegistrarLog("INFO", "🔄 Carregando configuração salva...");
-                    formConfig.CarregarConfiguracao();
-                    AtualizarServicos(); // Atualiza os serviços
-                    tabControlPrincipal.SelectedTab = tabVerificacao;
-                }
-                else
-                {
-                    // Se o usuário escolher "Não", envia para a tela de configuração
-                    tabControlPrincipal.SelectedTab = tabConfig;
-                }
-            }
-            else
-            {
-                // Se não existir config.ini, abre a aba "Configuração"
-                MessageBox.Show(
-                    "Nenhuma configuração encontrada. Por favor, configure o sistema.", 
-                    "Aviso", 
-                    MessageBoxButtons.OK, 
-                    MessageBoxIcon.Warning
-                );
-                tabControlPrincipal.SelectedTab = tabConfig;
-            }
         }
 
         private void CarregarFormularios()
@@ -89,7 +99,7 @@ namespace BlackSync.Forms
             _firebirdService = new FirebirdService(firebirdDSN);
 
             AdicionarFormularioAba(new FormConfig(this), tabConfig);
-            AdicionarFormularioAba(new FormVerificacao(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabVerificacao);
+            // AdicionarFormularioAba(new FormVerificacao(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabVerificacao);
             AdicionarFormularioAba(new FormEstrutura(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabEstrutura);
             AdicionarFormularioAba(new FormMigracao(this, mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabMigracao);
             AdicionarFormularioAba(new FormGestaoBancoDados(this, mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabManutencao);
@@ -111,9 +121,11 @@ namespace BlackSync.Forms
 
         public void AtualizarFormularios()
         {
-            tabVerificacao.Controls.Clear();
+            //tabVerificacao.Controls.Clear();
             tabEstrutura.Controls.Clear();
             tabMigracao.Controls.Clear();
+            tabManutencao.Controls.Clear();
+            tabLog.Controls.Clear();
 
             string mysqlServer = ConfigService.CarregarConfiguracaoMySQL().servidor;
             string mysqlDatabase = ConfigService.CarregarConfiguracaoMySQL().banco;
@@ -122,9 +134,11 @@ namespace BlackSync.Forms
             string firebirdDSN = ConfigService.CarregarConfiguracaoFirebird();
 
             // Recria os formulários com as novas configurações
-            AdicionarFormularioAba(new FormVerificacao(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabVerificacao);
+            //AdicionarFormularioAba(new FormVerificacao(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabVerificacao);
             AdicionarFormularioAba(new FormEstrutura(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabEstrutura);
             AdicionarFormularioAba(new FormMigracao(this, mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabMigracao);
+            AdicionarFormularioAba(new FormGestaoBancoDados(this, mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabManutencao);
+            AdicionarFormularioAba(new FormLogs(), tabLog);
         }
 
 
@@ -133,8 +147,12 @@ namespace BlackSync.Forms
             form.TopLevel = false;
             form.FormBorderStyle = FormBorderStyle.None;
             form.Dock = DockStyle.Fill;
+
+            aba.Controls.Clear();
             aba.Controls.Add(form);
+
             form.Show();
+            form.BringToFront();
         }
 
         private void tabConfig_Click(object sender, EventArgs e)
@@ -144,7 +162,7 @@ namespace BlackSync.Forms
 
         private void FormPrincipal_Load(object sender, EventArgs e)
         {
-
+            this.Font = new Font("Arial", 10);
         }
     }
 }

@@ -43,6 +43,7 @@
             lbDSN = new Label();
             button1 = new Button();
             btnSalvar = new Button();
+            lbDivisor1 = new Label();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             SuspendLayout();
@@ -125,7 +126,7 @@
             btnTestar.FlatStyle = FlatStyle.Flat;
             btnTestar.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btnTestar.ForeColor = Color.Honeydew;
-            btnTestar.Location = new Point(104, 161);
+            btnTestar.Location = new Point(85, 155);
             btnTestar.Name = "btnTestar";
             btnTestar.Size = new Size(128, 28);
             btnTestar.TabIndex = 5;
@@ -145,9 +146,9 @@
             groupBox1.Controls.Add(txtUsuario);
             groupBox1.Controls.Add(lbUsuario);
             groupBox1.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
-            groupBox1.Location = new Point(12, 24);
+            groupBox1.Location = new Point(129, 112);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(318, 195);
+            groupBox1.Size = new Size(301, 195);
             groupBox1.TabIndex = 13;
             groupBox1.TabStop = false;
             groupBox1.Text = "Configuração MySQL";
@@ -158,25 +159,26 @@
             groupBox2.Controls.Add(lbDSN);
             groupBox2.Controls.Add(button1);
             groupBox2.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
-            groupBox2.Location = new Point(355, 24);
+            groupBox2.Location = new Point(129, 12);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(355, 195);
+            groupBox2.Size = new Size(301, 94);
             groupBox2.TabIndex = 14;
             groupBox2.TabStop = false;
             groupBox2.Text = "Configuração Firebird";
             // 
             // txtDSN
             // 
-            txtDSN.Location = new Point(123, 73);
+            txtDSN.Location = new Point(52, 25);
             txtDSN.Name = "txtDSN";
             txtDSN.Size = new Size(226, 27);
             txtDSN.TabIndex = 6;
+            txtDSN.TextChanged += txtDSN_TextChanged;
             // 
             // lbDSN
             // 
             lbDSN.AutoSize = true;
             lbDSN.Font = new Font("Segoe UI", 11F);
-            lbDSN.Location = new Point(20, 79);
+            lbDSN.Location = new Point(11, 32);
             lbDSN.Name = "lbDSN";
             lbDSN.Size = new Size(39, 20);
             lbDSN.TabIndex = 0;
@@ -189,7 +191,7 @@
             button1.FlatStyle = FlatStyle.Flat;
             button1.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             button1.ForeColor = Color.Honeydew;
-            button1.Location = new Point(92, 161);
+            button1.Location = new Point(85, 58);
             button1.Name = "button1";
             button1.Size = new Size(128, 28);
             button1.TabIndex = 9;
@@ -205,7 +207,7 @@
             btnSalvar.FlatStyle = FlatStyle.Flat;
             btnSalvar.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btnSalvar.ForeColor = Color.Honeydew;
-            btnSalvar.Location = new Point(213, 232);
+            btnSalvar.Location = new Point(140, 313);
             btnSalvar.Name = "btnSalvar";
             btnSalvar.Size = new Size(255, 46);
             btnSalvar.TabIndex = 10;
@@ -213,12 +215,22 @@
             btnSalvar.UseVisualStyleBackColor = false;
             btnSalvar.Click += btnSalvar_Click;
             // 
+            // lbDivisor1
+            // 
+            lbDivisor1.BorderStyle = BorderStyle.Fixed3D;
+            lbDivisor1.Location = new Point(12, 371);
+            lbDivisor1.MaximumSize = new Size(0, 2);
+            lbDivisor1.Name = "lbDivisor1";
+            lbDivisor1.Size = new Size(543, 2);
+            lbDivisor1.TabIndex = 19;
+            // 
             // FormConfig
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.DimGray;
-            ClientSize = new Size(722, 295);
+            ClientSize = new Size(584, 601);
+            Controls.Add(lbDivisor1);
             Controls.Add(btnSalvar);
             Controls.Add(groupBox2);
             Controls.Add(groupBox1);
@@ -255,5 +267,7 @@
         private Button btnSalvar;
         private TextBox txtDSN;
         private Label lbDSN;
+        private Label lbDivisor2;
+        private Label lbDivisor1;
     }
 }

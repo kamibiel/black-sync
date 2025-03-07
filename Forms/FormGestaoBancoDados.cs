@@ -1,4 +1,5 @@
 ﻿using BlackSync.Services;
+using Org.BouncyCastle.Asn1.Cmp;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -33,59 +34,59 @@ namespace BlackSync.Forms
             _mySQLService = new MySQLService(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword);
             _firebirdService = new FirebirdService(firebirdDSN);
 
-            CarregarTabelas();
+            //CarregarTabelas();
         }
 
         public MySQLService ObterMySQLService() => _mySQLService;
         public FirebirdService ObterFirebirdService() => _firebirdService;
 
         // Carrega as tabelas do banco de dados do Firebird e MySQL        
-        private void CarregarTabelas()
-        {
-            LogService.RegistrarLog(
-                "INFO",
-                $"🔄 Carregando as tabelas dos bancos de dados."
-            );
+        //private void CarregarTabelas()
+        //{
+        //    LogService.RegistrarLog(
+        //        "INFO",
+        //        $"🔄 Carregando as tabelas dos bancos de dados."
+        //    );
 
-            try
-            {
-                var tabelasFirebird = _firebirdService.GetTabelasFirebird();
-                clbTabelasFirebird.Items.Clear();
+        //    try
+        //    {
+        //        var tabelasFirebird = _firebirdService.GetTabelasFirebird();
+        //        clbTabelasFirebird.Items.Clear();
 
-                foreach (var tabela in tabelasFirebird)
-                    clbTabelasFirebird.Items.Add(tabela, false);
+        //        foreach (var tabela in tabelasFirebird)
+        //            clbTabelasFirebird.Items.Add(tabela, false);
 
-                LogService.RegistrarLog(
-                    "SUCCESS",
-                    $"✅ Tabelas do banco Firebird carregadas com sucesso."
-                );
+        //        LogService.RegistrarLog(
+        //            "SUCCESS",
+        //            $"✅ Tabelas do banco Firebird carregadas com sucesso."
+        //        );
 
-                var tabelasMySQL = _mySQLService.GetTabelasMySQL();
-                clbTabelasMySQL.Items.Clear();
+        //        var tabelasMySQL = _mySQLService.GetTabelasMySQL();
+        //        clbTabelasMySQL.Items.Clear();
 
-                foreach (var tabela in tabelasMySQL)
-                    clbTabelasMySQL.Items.Add(tabela, false);
+        //        foreach (var tabela in tabelasMySQL)
+        //            clbTabelasMySQL.Items.Add(tabela, false);
 
-                LogService.RegistrarLog(
-                    "SUCCESS",
-                    $"✅ Tabelas do banco MySQL carregadas com sucesso."
-                );
-            }
-            catch (Exception ex)
-            {
-                LogService.RegistrarLog(
-                    "ERROR",
-                    $"Erro ao carregar tabelas: {ex.Message}"
-                );
+        //        LogService.RegistrarLog(
+        //            "SUCCESS",
+        //            $"✅ Tabelas do banco MySQL carregadas com sucesso."
+        //        );
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        LogService.RegistrarLog(
+        //            "ERROR",
+        //            $"❌ Erro ao carregar tabelas: {ex.Message}"
+        //        );
 
-                MessageBox.Show(
-                    $"Erro ao carregar tabelas: {ex.Message}",
-                    "Erro",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error
-                );
-            }
-        }
+        //        MessageBox.Show(
+        //            $"Erro ao carregar tabelas: {ex.Message}",
+        //            "Erro",
+        //            MessageBoxButtons.OK,
+        //            MessageBoxIcon.Error
+        //        );
+        //    }
+        //}
 
         private List<string> ObterTabelasPorCategoria(List<string> categorias)
         {
@@ -187,6 +188,14 @@ namespace BlackSync.Forms
                 pbGestao.Maximum = tabelasParaReabrir.Count;
                 pbGestao.Value = 0;
                 pbGestao.Step = 1;
+                btnAtualizarFilial.Enabled = false;
+                btnExcluirDados.Enabled = false;
+                btnFecharDados.Enabled = false;
+                btnReabrirDados.Enabled = false;
+                btnAlterarNumeracaoDocumentos.Enabled = false;
+                // btnTruncate.Enabled = false;
+                // btnLimpeza.Enabled = false;
+                btnExportarBanco.Enabled = false;
 
                 if (bancoSelecionado == "Firebird" || bancoSelecionado == "Ambos")
                 {
@@ -195,24 +204,57 @@ namespace BlackSync.Forms
                         $"🔄 Iniciando a reabertura dos dados das tabelas: {tabelasParaReabrir} para o banco de dados: {bancoSelecionado}."
                     );
 
-                    // Executar a atualização das tabelas de forma assíncrona
-                    await Task.Run(() => {
-                        foreach(string tabela in tabelasParaReabrir)
-                        {
-                            _firebirdService.ReabrirMovimentoFirebird(tabela, dataInicio, dataFim);
-
-                            // Atualizar a barra de progresso na UI Thread
-                            this.Invoke(new Action(() =>
-                            {
-                                pbGestao.PerformStep();
-                            }));
-                        }
-                    });
-
-                    LogService.RegistrarLog(
-                        "SUCCESS",
-                        $"$🚀 Finalizado a rebertura dos dados das tabelas: {tabelasParaReabrir} com sucesso!"
+                    var resposta = MessageBox.Show(
+                            $"🔍 Resumo da Operação{Environment.NewLine}" +
+                            $"📅 Período: {dataInicio:dd/MM/yyyy} a {dataFim:dd/MM/yyyy}{Environment.NewLine}" +
+                            $"🗄 Banco de Dados: {bancoSelecionado}{Environment.NewLine}" +
+                            $"📌 Categorias Selecionadas: {string.Join(", ", categoriasSelecionadas)}{Environment.NewLine}{Environment.NewLine}" +
+                            $"⚠️ Esta ação reabrirá os movimentos para o período selecionado.{Environment.NewLine}" +
+                            $"❗ Deseja realmente continuar?",
+                            "Confirmação de Reabertura",
+                            MessageBoxButtons.YesNo,
+                            MessageBoxIcon.Warning
                     );
+
+                    if (resposta == DialogResult.Yes)
+                    {
+                        // Executar a atualização das tabelas de forma assíncrona
+                        await Task.Run(() =>
+                        {
+                            foreach (string tabela in tabelasParaReabrir)
+                            {
+                                _firebirdService.ReabrirMovimentoFirebird(tabela, dataInicio, dataFim);
+
+                                // Atualizar a barra de progresso na UI Thread
+                                this.Invoke(new Action(() =>
+                                {
+                                    pbGestao.PerformStep();
+                                }));
+                            }
+                        });
+
+                        LogService.RegistrarLog(
+                            "SUCCESS",
+                            $"$🚀 Finalizado a rebertura dos dados das tabelas: {tabelasParaReabrir} com sucesso!"
+                        );
+                    }
+                    else
+                    {
+                        LogService.RegistrarLog(
+                            "INFO",
+                            $"⚠️ Operação cancelada: Reabertura do movimento não foi realizada para as categorias: {string.Join(", ", categoriasSelecionadas)}."
+                        );
+
+                        MessageBox.Show(
+                            $"🔄 Ação Cancelada{Environment.NewLine}{Environment.NewLine}" +
+                            $"As seguintes categorias não tiveram seus movimentos reabertos:{Environment.NewLine}" +
+                            $"📌 {string.Join(", ", categoriasSelecionadas)}{Environment.NewLine}{Environment.NewLine}" +
+                            $"✅ Nenhuma alteração foi feita.",
+                            "Operação Cancelada",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning
+                        );
+                    }
                 }
 
                 if (bancoSelecionado == "MySQL" || bancoSelecionado == "Ambos")
@@ -222,24 +264,67 @@ namespace BlackSync.Forms
                         $"🔄 Iniciando a reabertura dos movimentos das tabelas: {tabelasParaReabrir} para o banco de dados: {bancoSelecionado}."
                     );
 
-                    // Executar a atualização das tabelas de forma assíncrona
-                    await Task.Run (() => {
-                        foreach(string tabela in tabelasParaReabrir)
-                        {
-                            _mySQLService.ReabrirMovimentoMySQL(tabela, dataInicio, dataFim);
-
-                            // Atualizar a barra de progresso na UI Thread
-                            this.Invoke(new Action (() => {
-                                pbGestao.PerformStep();
-                            }));
-                        }
-                    });
-
-                    LogService.RegistrarLog(
-                        "SUCCESS",
-                        $"$🚀 Finalizado a rebertura dos movimentos das tabelas: {tabelasParaReabrir} com sucesso!"
+                    var resposta = MessageBox.Show(
+                            $"🔍 Resumo da Operação{Environment.NewLine}" +
+                            $"📅 Período: {dataInicio:dd/MM/yyyy} a {dataFim:dd/MM/yyyy}{Environment.NewLine}" +
+                            $"🗄 Banco de Dados: {bancoSelecionado}{Environment.NewLine}" +
+                            $"📌 Categorias Selecionadas: {string.Join(", ", categoriasSelecionadas)}{Environment.NewLine}{Environment.NewLine}" +
+                            $"⚠️ Esta ação reabrirá os movimentos para o período selecionado.{Environment.NewLine}" +
+                            $"❗ Deseja realmente continuar?",
+                            "Confirmação de Reabertura",
+                            MessageBoxButtons.YesNo,
+                            MessageBoxIcon.Warning
                     );
+
+                    if (resposta == DialogResult.Yes)
+                    {
+                        // Executar a atualização das tabelas de forma assíncrona
+                        await Task.Run(() =>
+                        {
+                            foreach (string tabela in tabelasParaReabrir)
+                            {
+                                _mySQLService.ReabrirMovimentoMySQL(tabela, dataInicio, dataFim);
+
+                                // Atualizar a barra de progresso na UI Thread
+                                this.Invoke(new Action(() =>
+                                {
+                                    pbGestao.PerformStep();
+                                }));
+                            }
+                        });
+
+                        LogService.RegistrarLog(
+                            "SUCCESS",
+                            $"$🚀 Finalizado a rebertura dos movimentos das tabelas: {tabelasParaReabrir} com sucesso!"
+                        );
+                    }
+                    else
+                    {
+                        LogService.RegistrarLog(
+                            "INFO",
+                            $"⚠️ Operação cancelada: Reabertura do movimento não foi realizada para as categorias: {string.Join(", ", categoriasSelecionadas)}."
+                        );
+
+                        MessageBox.Show(
+                            $"🔄 Ação Cancelada{Environment.NewLine}{Environment.NewLine}" +
+                            $"As seguintes categorias não tiveram seus movimentos reabertos:{Environment.NewLine}" +
+                            $"📌 {string.Join(", ", categoriasSelecionadas)}{Environment.NewLine}{Environment.NewLine}" +
+                            $"✅ Nenhuma alteração foi feita.",
+                            "Operação Cancelada",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning
+                        );
+                    }
                 }
+
+                btnAtualizarFilial.Enabled = true;
+                btnExcluirDados.Enabled = true;
+                btnFecharDados.Enabled = true;
+                btnReabrirDados.Enabled = true;
+                btnAlterarNumeracaoDocumentos.Enabled = true;
+                // btnTruncate.Enabled = true;
+                // btnLimpeza.Enabled = true;
+                btnExportarBanco.Enabled = true;
 
                 MessageBox.Show(
                     "Movimento reaberto com sucesso!",
@@ -252,10 +337,10 @@ namespace BlackSync.Forms
             {
                 LogService.RegistrarLog(
                     "ERROR",
-                    $"Erro ao reabrir movimento: {ex.Message}"
+                    $"❌ Erro ao reabrir movimento: {ex.Message}"
                 );
                 MessageBox.Show(
-                    $"Erro ao reabrir movimento: {ex.Message}",
+                    $"❌ Erro ao reabrir movimento: {ex.Message}",
                     "Erro",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error
@@ -341,7 +426,16 @@ namespace BlackSync.Forms
                 pbGestao.Minimum = 0;
                 pbGestao.Maximum = tabelasParaFechar.Count;
                 pbGestao.Value = 0;
-                pbGestao.Step = 1;                
+                pbGestao.Step = 1;
+                btnAtualizarFilial.Enabled = false;
+                btnExcluirDados.Enabled = false;
+                btnFecharDados.Enabled = false;
+                btnReabrirDados.Enabled = false;
+                btnAlterarNumeracaoDocumentos.Enabled = false;
+                // btnTruncate.Enabled = false;
+                // btnLimpeza.Enabled = false;
+                btnExportarBanco.Enabled = false;
+
 
                 if (bancoSelecionado == "Firebird" || bancoSelecionado == "Ambos")
                 {
@@ -350,23 +444,57 @@ namespace BlackSync.Forms
                         $"🔄 Iniciando o fechamento dos movimentos das tabelas: {tabelasParaFechar} para o banco de dados: {bancoSelecionado}."
                     );
 
-                    // Executar a atualização das tabelas de forma assíncrona
-                    await Task.Run(() => {
-                        foreach(string tabela in tabelasParaFechar)
-                        {
-                            _firebirdService.FecharMovimentoFirebird(tabela, dataInicio, dataFim);
-
-                            // Atualizar a barra de progresso na UI Thread
-                            this.Invoke(new Action(() => {
-                                pbGestao.PerformStep();
-                            }));
-                        }
-                    });
-
-                    LogService.RegistrarLog(
-                        "SUCCESS",
-                        $"$🚀 Finalizado o fechamento dos movimentos das tabelas: {tabelasParaFechar} com sucesso!"
+                    var resposta = MessageBox.Show(
+                            $"🔍 Resumo da Operação{Environment.NewLine}" +
+                            $"📅 Período: {dataInicio:dd/MM/yyyy} a {dataFim:dd/MM/yyyy}{Environment.NewLine}" +
+                            $"🗄 Banco de Dados: {bancoSelecionado}{Environment.NewLine}" +
+                            $"📌 Categorias Selecionadas: {string.Join(", ", categoriasSelecionadas)}{Environment.NewLine}{Environment.NewLine}" +
+                            $"⚠️ Esta ação fechará os movimentos para o período selecionado.{Environment.NewLine}" +
+                            $"❗ Deseja realmente continuar?",
+                            "Confirmação de Fechamento",
+                            MessageBoxButtons.YesNo,
+                            MessageBoxIcon.Warning
                     );
+
+                    if (resposta == DialogResult.Yes)
+                    {
+                        // Executar a atualização das tabelas de forma assíncrona
+                        await Task.Run(() =>
+                        {
+                            foreach (string tabela in tabelasParaFechar)
+                            {
+                                _firebirdService.FecharMovimentoFirebird(tabela, dataInicio, dataFim);
+
+                                // Atualizar a barra de progresso na UI Thread
+                                this.Invoke(new Action(() =>
+                                {
+                                    pbGestao.PerformStep();
+                                }));
+                            }
+                        });
+
+                        LogService.RegistrarLog(
+                            "SUCCESS",
+                            $"$🚀 Finalizado o fechamento dos movimentos das tabelas: {tabelasParaFechar} com sucesso!"
+                        );
+                    }
+                    else
+                    {
+                        LogService.RegistrarLog(
+                            "INFO",
+                            $"⚠️ Operação cancelada: Fechamento do movimento não foi realizada para as categorias: {string.Join(", ", categoriasSelecionadas)}."
+                        );
+
+                        MessageBox.Show(
+                            $"🔄 Ação Cancelada{Environment.NewLine}{Environment.NewLine}" +
+                            $"As seguintes categorias não tiveram seus movimentos fechados:{Environment.NewLine}" +
+                            $"📌 {string.Join(", ", categoriasSelecionadas)}{Environment.NewLine}{Environment.NewLine}" +
+                            $"✅ Nenhuma alteração foi feita.",
+                            "Operação Cancelada",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning
+                        );
+                    }
                 }
 
                 if (bancoSelecionado == "MySQL" || bancoSelecionado == "Ambos")
@@ -376,25 +504,68 @@ namespace BlackSync.Forms
                         $"🔄 Iniciando o fechamento dos movimentos das tabelas: {tabelasParaFechar} para o banco de dados: {bancoSelecionado}."
                     );
 
-                    // Executar a atualização das tabelas de forma assíncrona
-                    await Task.Run(() => {
-                        foreach(string tabela in tabelasParaFechar)
-                        {
-                            _mySQLService.FecharMovimentoMySQL(tabela, dataInicio, dataFim);
-
-                            // Atualizar a barra de progresso na UI Thread
-                            this.Invoke(new Action(() =>
-                            {
-                                pbGestao.PerformStep();
-                            }));
-                        }
-                    });
-
-                    LogService.RegistrarLog(
-                        "SUCCESS",
-                        $"$🚀 Finalizado o fechamento dos movimentos das tabelas: {tabelasParaFechar} com sucesso!"
+                    var resposta = MessageBox.Show(
+                            $"🔍 Resumo da Operação{Environment.NewLine}" +
+                            $"📅 Período: {dataInicio:dd/MM/yyyy} a {dataFim:dd/MM/yyyy}{Environment.NewLine}" +
+                            $"🗄 Banco de Dados: {bancoSelecionado}{Environment.NewLine}" +
+                            $"📌 Categorias Selecionadas: {string.Join(", ", categoriasSelecionadas)}{Environment.NewLine}{Environment.NewLine}" +
+                            $"⚠️ Esta ação fechar os movimentos para o período selecionado.{Environment.NewLine}" +
+                            $"❗ Deseja realmente continuar?",
+                            "Confirmação de Fechamento",
+                            MessageBoxButtons.YesNo,
+                            MessageBoxIcon.Warning
                     );
+
+                    if (resposta == DialogResult.Yes)
+                    {
+                        // Executar a atualização das tabelas de forma assíncrona
+                        await Task.Run(() =>
+                        {
+                            foreach (string tabela in tabelasParaFechar)
+                            {
+                                _mySQLService.FecharMovimentoMySQL(tabela, dataInicio, dataFim);
+
+                                // Atualizar a barra de progresso na UI Thread
+                                this.Invoke(new Action(() =>
+                                {
+                                    pbGestao.PerformStep();
+                                }));
+                            }
+                        });
+
+                        LogService.RegistrarLog(
+                            "SUCCESS",
+                            $"$🚀 Finalizado o fechamento dos movimentos das tabelas: {tabelasParaFechar} com sucesso!"
+                        );
+                    }
+                    else
+                    {
+                        LogService.RegistrarLog(
+                            "INFO",
+                            $"⚠️ Operação cancelada: Fechamento do movimento não foi realizada para as categorias: {string.Join(", ", categoriasSelecionadas)}."
+                        );
+
+                        MessageBox.Show(
+                            $"🔄 Ação Cancelada{Environment.NewLine}{Environment.NewLine}" +
+                            $"As seguintes categorias não tiveram seus movimentos fechados:{Environment.NewLine}" +
+                            $"📌 {string.Join(", ", categoriasSelecionadas)}{Environment.NewLine}{Environment.NewLine}" +
+                            $"✅ Nenhuma alteração foi feita.",
+                            "Operação Cancelada",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning
+                        );
+                    }
+
                 }
+
+                btnAtualizarFilial.Enabled = true;
+                btnExcluirDados.Enabled = true;
+                btnFecharDados.Enabled = true;
+                btnReabrirDados.Enabled = true;
+                btnAlterarNumeracaoDocumentos.Enabled = true;
+                // btnTruncate.Enabled = true;
+                // btnLimpeza.Enabled = true;
+                btnExportarBanco.Enabled = true;
 
                 MessageBox.Show(
                     "Movimento fechado com sucesso!",
@@ -407,10 +578,10 @@ namespace BlackSync.Forms
             {
                 LogService.RegistrarLog(
                     "ERROR",
-                    $"Erro ao fechar movimento: {ex.Message}"
+                    $"❌ Erro ao fechar movimento: {ex.Message}"
                 );
                 MessageBox.Show(
-                    $"Erro ao fechar movimento: {ex.Message}",
+                    $"❌ Erro ao fechar movimento: {ex.Message}",
                     "Erro",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error
@@ -496,7 +667,15 @@ namespace BlackSync.Forms
                 pbGestao.Minimum = 0;
                 pbGestao.Maximum = tabelasParaExcluir.Count;
                 pbGestao.Value = 0;
-                pbGestao.Step = 1;                
+                pbGestao.Step = 1;
+                btnAtualizarFilial.Enabled = false;
+                btnExcluirDados.Enabled = false;
+                btnFecharDados.Enabled = false;
+                btnReabrirDados.Enabled = false;
+                btnAlterarNumeracaoDocumentos.Enabled = false;
+                // btnTruncate.Enabled = false;
+                // btnLimpeza.Enabled = false;
+                btnExportarBanco.Enabled = false;
 
                 if (bancoSelecionado == "Firebird" || bancoSelecionado == "Ambos")
                 {
@@ -505,26 +684,58 @@ namespace BlackSync.Forms
                         $"🔄 Iniciando a exclusão dos movimentos das tabelas: {tabelasParaExcluir} para o banco de dados: {bancoSelecionado}."
                     );
 
-                    // Executar a atualização das tabelas de forma assíncrona
-                    await Task.Run(() =>
-                    {
-                        // Executa a exclusão no Firebird
-                        foreach (string tabela in tabelasParaExcluir)
-                        {
-                            _firebirdService.ExcluirMovimentoFirebird(tabela, dataInicio, dataFim);
-
-                            // Atualizar a barra de progresso na UI Thread
-                            this.Invoke(new Action(() =>
-                            {
-                                pbGestao.PerformStep();
-                            }));
-                        }
-                    });    
-
-                    LogService.RegistrarLog(
-                        "SUCCESS",
-                        $"🚀 Finalizado a exclusão dos movimentos das tabelas: {tabelasParaExcluir} com sucesso!"
+                    var resposta = MessageBox.Show(
+                            $"🔍 Resumo da Operação{Environment.NewLine}" +
+                            $"📅 Período: {dataInicio:dd/MM/yyyy} a {dataFim:dd/MM/yyyy}{Environment.NewLine}" +
+                            $"🗄 Banco de Dados: {bancoSelecionado}{Environment.NewLine}" +
+                            $"📌 Categorias Selecionadas: {string.Join(", ", categoriasSelecionadas)}{Environment.NewLine}{Environment.NewLine}" +
+                            $"⚠️ Esta ação excluirá os movimentos para o período selecionado.{Environment.NewLine}" +
+                            $"❗ Deseja realmente continuar?",
+                            "Confirmação de Exclusão",
+                            MessageBoxButtons.YesNo,
+                            MessageBoxIcon.Warning
                     );
+
+                    if (resposta == DialogResult.Yes)
+                    {
+                        // Executar a atualização das tabelas de forma assíncrona
+                        await Task.Run(() =>
+                        {
+                            // Executa a exclusão no Firebird
+                            foreach (string tabela in tabelasParaExcluir)
+                            {
+                                _firebirdService.ExcluirMovimentoFirebird(tabela, dataInicio, dataFim);
+
+                                // Atualizar a barra de progresso na UI Thread
+                                this.Invoke(new Action(() =>
+                                {
+                                    pbGestao.PerformStep();
+                                }));
+                            }
+                        });
+
+                        LogService.RegistrarLog(
+                            "SUCCESS",
+                            $"🚀 Finalizado a exclusão dos movimentos das tabelas: {tabelasParaExcluir} com sucesso!"
+                        );
+                    }
+                    else
+                    {
+                        LogService.RegistrarLog(
+                           "INFO",
+                           $"⚠️ Operação cancelada: Exclusão do movimento não foi realizada para as categorias: {string.Join(", ", categoriasSelecionadas)}."
+                        );
+
+                        MessageBox.Show(
+                            $"🔄 Ação Cancelada{Environment.NewLine}{Environment.NewLine}" +
+                            $"As seguintes categorias não tiveram seus movimentos excluídos:{Environment.NewLine}" +
+                            $"📌 {string.Join(", ", categoriasSelecionadas)}{Environment.NewLine}{Environment.NewLine}" +
+                            $"✅ Nenhuma alteração foi feita.",
+                            "Operação Cancelada",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning
+                        );
+                    }
                 }
 
                 if (bancoSelecionado == "MySQL" || bancoSelecionado == "Ambos")
@@ -534,26 +745,69 @@ namespace BlackSync.Forms
                         $"🔄 Iniciando a exclusão dos movimentos das tabelas: {tabelasParaExcluir} para o banco de dados: {bancoSelecionado}."
                     );
 
-                    await Task.Run(()=>{
-                        
-                        // Executa a exclusão no MySQL
-                        foreach(string tabela in tabelasParaExcluir)
-                        {
-                            _mySQLService.ExcluirMovimentoMySQL(tabela, dataInicio, dataFim);
-
-                            // Atualizar a barra de progresso na UI Thread
-                            this.Invoke(new Action(() =>
-                            {
-                                pbGestao.PerformStep();
-                            }));
-                        }
-                    });
-
-                    LogService.RegistrarLog(
-                        "SUCCESS",
-                        $"🚀 Finalizado a exclusão dos movimentos das tabelas: {tabelasParaExcluir} com sucesso!"
+                    var resposta = MessageBox.Show(
+                            $"🔍 Resumo da Operação{Environment.NewLine}" +
+                            $"📅 Período: {dataInicio:dd/MM/yyyy} a {dataFim:dd/MM/yyyy}{Environment.NewLine}" +
+                            $"🗄 Banco de Dados: {bancoSelecionado}{Environment.NewLine}" +
+                            $"📌 Categorias Selecionadas: {string.Join(", ", categoriasSelecionadas)}{Environment.NewLine}{Environment.NewLine}" +
+                            $"⚠️ Esta ação excluirá os movimentos para o período selecionado.{Environment.NewLine}" +
+                            $"❗ Deseja realmente continuar?",
+                            "Confirmação de Exclusão",
+                            MessageBoxButtons.YesNo,
+                            MessageBoxIcon.Warning
                     );
+
+                    if (resposta == DialogResult.Yes)
+                    {
+                        // Executar a atualização das tabelas de forma assíncrona
+                        await Task.Run(() =>
+                        {
+
+                            // Executa a exclusão no MySQL
+                            foreach (string tabela in tabelasParaExcluir)
+                            {
+                                _mySQLService.ExcluirMovimentoMySQL(tabela, dataInicio, dataFim);
+
+                                // Atualizar a barra de progresso na UI Thread
+                                this.Invoke(new Action(() =>
+                                {
+                                    pbGestao.PerformStep();
+                                }));
+                            }
+                        });
+
+                        LogService.RegistrarLog(
+                            "SUCCESS",
+                            $"🚀 Finalizado a exclusão dos movimentos das tabelas: {tabelasParaExcluir} com sucesso!"
+                        );
+                    }
+                    else
+                    {
+                        LogService.RegistrarLog(
+                           "INFO",
+                           $"⚠️ Operação cancelada: Exclusão do movimento não foi realizada para as categorias: {string.Join(", ", categoriasSelecionadas)}."
+                        );
+
+                        MessageBox.Show(
+                            $"🔄 Ação Cancelada{Environment.NewLine}{Environment.NewLine}" +
+                            $"As seguintes categorias não tiveram seus movimentos excluídos:{Environment.NewLine}" +
+                            $"📌 {string.Join(", ", categoriasSelecionadas)}{Environment.NewLine}{Environment.NewLine}" +
+                            $"✅ Nenhuma alteração foi feita.",
+                            "Operação Cancelada",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning
+                        );
+                    }
                 }
+
+                btnAtualizarFilial.Enabled = true;
+                btnExcluirDados.Enabled = true;
+                btnFecharDados.Enabled = true;
+                btnReabrirDados.Enabled = true;
+                btnAlterarNumeracaoDocumentos.Enabled = true;
+                // btnTruncate.Enabled = true;
+                // btnLimpeza.Enabled = true;
+                btnExportarBanco.Enabled = true;
 
                 MessageBox.Show(
                     "Movimento excluído com sucesso!",
@@ -567,10 +821,10 @@ namespace BlackSync.Forms
             {
                 LogService.RegistrarLog(
                     "ERRO",
-                    $"Erro ao excluir os movimentos: {ex.Message}"
+                    $"❌ Erro ao excluir os movimentos: {ex.Message}"
                 );
                 MessageBox.Show(
-                    $"Erro ao excluir os movimentos: {ex.Message}",
+                    $"❌ Erro ao excluir os movimentos: {ex.Message}",
                     "Erro",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error
@@ -632,9 +886,9 @@ namespace BlackSync.Forms
                 }
 
                 // Obtém as tabelas especificas para cada categoria
-                List<string> tabelasParaAtualizarFilial = ObterTabelasPorCategoria(categoriasSelecionadas);
+                List<string> tabelasLimpezaBanco = ObterTabelasPorCategoria(categoriasSelecionadas);
 
-                if (tabelasParaAtualizarFilial.Count == 0)
+                if (tabelasLimpezaBanco.Count == 0)
                 {
                     MessageBox.Show(
                         "Nenhuma tabela foi selecionada para atualização da filial.",
@@ -653,7 +907,7 @@ namespace BlackSync.Forms
 
                 LogService.RegistrarLog(
                     "INFO",
-                    $"🔄 Tabelas selecionadas para atualização da filial: {string.Join(", ", tabelasParaAtualizarFilial)}."
+                    $"🔄 Tabelas selecionadas para atualização da filial: {string.Join(", ", tabelasLimpezaBanco)}."
                 );
 
                 // Verifica qual banco foi selecionado
@@ -678,9 +932,17 @@ namespace BlackSync.Forms
 
                 // Iniciar barra de progresso
                 pbGestao.Minimum = 0;
-                pbGestao.Maximum = tabelasParaAtualizarFilial.Count;
+                pbGestao.Maximum = tabelasLimpezaBanco.Count;
                 pbGestao.Value = 0;
                 pbGestao.Step = 1;
+                btnAtualizarFilial.Enabled = false;
+                btnExcluirDados.Enabled = false;
+                btnFecharDados.Enabled = false;
+                btnReabrirDados.Enabled = false;
+                btnAlterarNumeracaoDocumentos.Enabled = false;
+                // btnTruncate.Enabled = false;
+                // btnLimpeza.Enabled = false;
+                btnExportarBanco.Enabled = false;
 
                 // Atualiza a filial nas tabelas do Firebird
                 LogService.RegistrarLog(
@@ -688,25 +950,65 @@ namespace BlackSync.Forms
                     $"🔄 Atualizando filial nas tabelas do Firebird."
                 );
 
-                // Executar a atualização das tabelas de forma assíncrona
-                await Task.Run(() =>
-                {
-                    foreach (string tabela in tabelasParaAtualizarFilial)
-                    {
-                        _firebirdService.AtualizarFilialFirebird(tabela, xFilial);
-
-                        // Atualizar a barra de progresso na UI Thread
-                        this.Invoke(new Action(() =>
-                        {
-                            pbGestao.PerformStep();
-                        }));
-                    }
-                });
-
-                LogService.RegistrarLog(
-                    "SUCCESS",
-                    $"✅ Atualização da filial concluída para as tabelas: {string.Join(", ", tabelasParaAtualizarFilial)}."
+                var resposta = MessageBox.Show(
+                        $"🔍 Resumo da Operação{Environment.NewLine}" +
+                        $"🗄 Banco de Dados: {bancoSelecionado}{Environment.NewLine}" +
+                        $"📌 Categorias Selecionadas: {string.Join(", ", categoriasSelecionadas)}{Environment.NewLine}{Environment.NewLine}" +
+                        $"⚠️ Esta ação atualizará a filial para a(s) categoria(s) selecionada(s).{Environment.NewLine}" +
+                        $"❗ Deseja realmente continuar?",
+                        "Confirmação a Atualização",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning
                 );
+
+                if (resposta == DialogResult.Yes)
+                {
+                    // Executar a atualização das tabelas de forma assíncrona
+                    await Task.Run(() =>
+                    {
+                        foreach (string tabela in tabelasLimpezaBanco)
+                        {
+                            _firebirdService.AtualizarFilialFirebird(tabela, xFilial);
+
+                            // Atualizar a barra de progresso na UI Thread
+                            this.Invoke(new Action(() =>
+                            {
+                                pbGestao.PerformStep();
+                            }));
+                        }
+                    });
+
+                    LogService.RegistrarLog(
+                        "SUCCESS",
+                        $"✅ Atualização da filial concluída para as tabelas: {string.Join(", ", tabelasLimpezaBanco)}."
+                    );
+                }
+                else
+                {
+                    LogService.RegistrarLog(
+                        "INFO",
+                        $"⚠️ Operação cancelada: Atualização da filial não foi realizada para as categorias: {string.Join(", ", categoriasSelecionadas)}."
+                    );
+
+                    MessageBox.Show(
+                        $"🔄 Ação Cancelada{Environment.NewLine}{Environment.NewLine}" +
+                        $"As seguintes categorias não tiveram sua filial atualizada:{Environment.NewLine}" +
+                        $"📌 {string.Join(", ", categoriasSelecionadas)}{Environment.NewLine}{Environment.NewLine}" +
+                        $"✅ Nenhuma alteração foi feita.",
+                        "Operação Cancelada",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning
+                    );
+                }
+
+                btnAtualizarFilial.Enabled = true;
+                btnExcluirDados.Enabled = true;
+                btnFecharDados.Enabled = true;
+                btnReabrirDados.Enabled = true;
+                btnAlterarNumeracaoDocumentos.Enabled = true;
+                // btnTruncate.Enabled = true;
+                // btnLimpeza.Enabled = true;
+                btnExportarBanco.Enabled = true;
 
                 MessageBox.Show(
                     "Atualização da filial concluída com sucesso!",
@@ -731,9 +1033,139 @@ namespace BlackSync.Forms
             }
         }
 
+        private async void btnAlterarNumeracaoDocumento_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                LogService.RegistrarLog("INFO", "🔄 Iniciando o processo de alterar a numeração dos documentos");
+
+                // Pega os valores da empresa/documento
+                int xEmpresa = (int)nEmpresa.Value;
+                int yEmpresa = (int)nEmpresaN.Value; // Novo valor da empresa/documento
+
+                if (xEmpresa <= 0 || yEmpresa <= 0)
+                {
+                    MessageBox.Show(
+                        "Por favor, selecione números válidos para a numeração.",
+                        "Aviso",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning
+                    );
+
+                    LogService.RegistrarLog("INFO", "⚠️ Numeração inválida informada.");
+                    return;
+                }
+
+                LogService.RegistrarLog(
+                    "INFO",
+                    $"📌 Número da empresa selecionada: {xEmpresa}. Novo número: {yEmpresa}."
+                );
+
+                // Verifica quais tipos de dados foram marcados
+                List<string> categoriasSelecionadas = new List<string>();
+                if (cbEstoque.Checked) categoriasSelecionadas.Add("Estoque");
+                if (cbFinanceiro.Checked) categoriasSelecionadas.Add("Financeiro");
+                if (cbVendas.Checked) categoriasSelecionadas.Add("Vendas");
+
+                if (categoriasSelecionadas.Count == 0)
+                {
+                    MessageBox.Show(
+                        "Selecione ao menos um tipo de dado (Estoque, Financeiro, Vendas).",
+                        "Aviso",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning
+                    );
+
+                    LogService.RegistrarLog("INFO", $"⚠️ Nenhuma categoria selecionada.");
+                    return;
+                }
+
+                // Obtém as tabelas específicas para cada categoria
+                List<string> tabelasParaAlterar = ObterTabelasPorCategoria(categoriasSelecionadas);
+
+                if (tabelasParaAlterar.Count == 0)
+                {
+                    MessageBox.Show(
+                        "Nenhuma tabela foi selecionada para alteração dos documentos.",
+                        "Aviso",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning
+                    );
+
+                    LogService.RegistrarLog("INFO", "⚠️ Nenhuma tabela foi selecionada para a alteração dos documentos.");
+                    return;
+                }
+
+                // Verifica qual banco foi selecionado
+                string bancoSelecionado = cbBanco.SelectedItem.ToString();
+                LogService.RegistrarLog("INFO", $"📤 Banco de dados selecionado: {bancoSelecionado}");
+
+                // Configurar barra de progresso
+                pbGestao.Minimum = 0;
+                pbGestao.Maximum = tabelasParaAlterar.Count;
+                pbGestao.Value = 0;
+                pbGestao.Step = 1;
+
+                // Desativar botões durante o processo
+                btnAlterarNumeracaoDocumentos.Enabled = false;
+
+                if (bancoSelecionado == "Firebird" || bancoSelecionado == "Ambos")
+                {
+                    var resposta = MessageBox.Show(
+                        $"🔍 Resumo da Operação{Environment.NewLine}" +
+                        $"🗄 Banco de Dados: {bancoSelecionado}{Environment.NewLine}" +
+                        $"📌 Categorias Selecionadas: {string.Join(", ", categoriasSelecionadas)}{Environment.NewLine}{Environment.NewLine}" +
+                        $"⚠️ Esta ação altera todos os documentos dos movimentos.{Environment.NewLine}" +
+                        $"❗ Deseja realmente continuar?",
+                        "Confirmação de Alteração",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning
+                    );
+
+                    if (resposta == DialogResult.Yes)
+                    {
+                        await Task.Run(() =>
+                        {
+                            foreach (string tabela in tabelasParaAlterar)
+                            {
+                                _firebirdService.AlterarDocumentoFirebird(tabela, xEmpresa, yEmpresa);
+                                this.Invoke(new Action(() => pbGestao.PerformStep()));
+                            }
+                        });
+
+                        LogService.RegistrarLog("SUCCESS", $"🚀 Alteração concluída para as tabelas: {tabelasParaAlterar}.");
+                    }
+                }
+
+                if (bancoSelecionado == "MySQL" || bancoSelecionado == "Ambos")
+                {
+                    await Task.Run(() =>
+                    {
+                        foreach (string tabela in tabelasParaAlterar)
+                        {
+                            _mySQLService.AlterarDocumentoMySQL(tabela, xEmpresa, yEmpresa);
+                            this.Invoke(new Action(() => pbGestao.PerformStep()));
+                        }
+                    });
+
+                    LogService.RegistrarLog("SUCCESS", $"🚀 Alteração concluída para as tabelas: {tabelasParaAlterar}.");
+                }
+
+                // Reativar botões
+                btnAlterarNumeracaoDocumentos.Enabled = true;
+
+                MessageBox.Show("Alteração concluída com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                LogService.RegistrarLog("ERROR", $"❌ Erro ao alterar numeração dos documentos: {ex.Message}");
+                MessageBox.Show($"Erro ao alterar numeração dos documentos:{Environment.NewLine}{ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         private void btnExportarBanco_Click(object sender, EventArgs e)
         {
-
+            MessageBox.Show("⚠️ Função ainda não disponível.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
     }
 }

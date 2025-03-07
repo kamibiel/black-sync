@@ -10,6 +10,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using MySql.Data.MySqlClient;
 
 namespace BlackSync.Forms
 {
@@ -18,14 +19,18 @@ namespace BlackSync.Forms
         private readonly MySQLService _mySQLService;
         private readonly FirebirdService _firebirdService;
         private readonly FormPrincipal _formPrincipal;
+        private List<string> _tabelasMySQL = new List<string>();
 
-        public FormMigracao(FormPrincipal formprincipal, string mysqlServer, string mysqlDatabase, string mysqlUser, string mysqlPassword, string firebirdDSN)
+        public FormMigracao(
+            FormPrincipal formprincipal, 
+            string mysqlServer, 
+            string mysqlDatabase, 
+            string mysqlUser, 
+            string mysqlPassword, 
+            string firebirdDSN)
         {
             InitializeComponent();
             _formPrincipal = formprincipal ?? throw new ArgumentNullException(nameof(formprincipal));
-
-            //_mySQLService = new MySQLService(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword);
-            //_firebirdService = new FirebirdService(firebirdDSN);
 
             _mySQLService = _formPrincipal.ObterMySQLService();
             _firebirdService = _formPrincipal.ObterFirebirdService();
@@ -51,7 +56,158 @@ namespace BlackSync.Forms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao carregar tabelas: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error); 
+                MessageBox.Show($"Erro ao carregar tabelas: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                LogService.RegistrarLog("ERRO", $"❌ Erro ao carregar tabelas: {ex.Message}");
+            }
+        }       
+
+        private void btnVerificarTabelas_Click(Object sender, EventArgs e)
+        {
+            CarregarTabelasMySQL();
+            CompararTabelas();
+        }
+
+        private void CarregarTabelasMySQL()
+        {
+            try
+            {
+                // Armazena as tabelas do MySQL
+                _tabelasMySQL.Clear();
+
+                (string servidor, string banco, string usuario, string senha) = ConfigService.CarregarConfiguracaoMySQL();
+                string connectionString = $"Server={servidor};Database={banco};User Id={usuario};Password={senha};";
+
+                using (var connection = new MySqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string query = "SHOW TABLES";
+
+                    using (var cmd = new MySqlCommand(query, connection))
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            _tabelasMySQL.Add(reader.GetString(0).Trim().ToUpper());
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogService.RegistrarLog("ERRO", $"❌ Erro ao carregar tabelas do MySQL: {ex.Message}");
+                MessageBox.Show($"❌ Erro ao carregar tabelas do MySQL: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void CompararTabelas()
+        {
+            List<string> tabelasFirebird = clbTabelasFirebird.Items.Cast<string>().Select(t => t.ToUpper()).ToList();
+            List<string> apenasNoFirebird = tabelasFirebird.Except(_tabelasMySQL).ToList(); // Filtra as tabelas que estão no Firebird e não no MySQL
+
+            LogService.RegistrarLog("INFO", $"🔄 Limpando o Log Verificação");
+            txtLog.Clear(); // Limpa o log para exibir os novos resultados
+
+            LogService.RegistrarLog("INFO", $"🔄 Iniciando a verificação das tabelas.");
+
+            if (apenasNoFirebird.Count > 0)
+            {
+                LogService.RegistrarLog("INFO", $"📤 Comparando total de {apenasNoFirebird.Count} tabelas.");
+                txtLog.AppendText($"⚠️ Tabelas que estão no Firebird e não no MySQL:{Environment.NewLine}");
+
+                for (int i = 0; i < clbTabelasFirebird.Items.Count; i++)
+                {
+                    string tabela = clbTabelasFirebird.Items[i].ToString().Trim().ToUpper();
+
+                    if (apenasNoFirebird.Contains(tabela))
+                    {
+                        clbTabelasFirebird.SetItemChecked(i, true); // Marca as tabelas que precisam ser criadas no MySQL
+                        txtLog.AppendText($"- {tabela}{Environment.NewLine}");
+                    }
+                    else
+                    {
+                        clbTabelasFirebird.SetItemChecked(i, false); // Desmarca as que já existem no MySQL
+                    }
+                }
+            }
+            else
+            {
+                LogService.RegistrarLog("INFO", $"✅ Todas as tabelas já existem no MySQL.");
+                txtLog.AppendText($"✅ Todas as tabelas já existem no MySQL.{Environment.NewLine}");
+            }
+
+            LogService.RegistrarLog("INFO", $"🎉 Comparação concluída.");
+        }
+
+        private async void btnGerarScripts_Click(object sender, EventArgs e)
+        {
+            if (txtLog.Text.Contains("✅ Todas as tabelas já existem no MySQL"))
+            {
+                MessageBox.Show("✅ Nenhuma tabela para gerar script.", "Informação", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LogService.RegistrarLog("INFO", $"✅ Nenhuma tabela para gerar script.");
+                return;
+            }
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Title = "Salvar Script MySQL",
+                Filter = "Arquivo SQL (*.sql)|*.sql",
+                DefaultExt = "sql",
+                FileName = "script-mysql-verificacao.sql"
+            };
+
+            if (saveFileDialog.ShowDialog() != DialogResult.OK)
+            {
+                return;
+            }
+
+            string caminhoMySQL = saveFileDialog.FileName;
+            pbMigracao.Visible = true;
+            pbMigracao.Value = 0;
+            btnMigrar.Enabled = false;
+            btnVerificarTabelas.Enabled = false;
+            btnVerificarEstrutura.Enabled = false;
+            btnGerarScripts.Enabled = false;
+
+            string firebirdDSN = ConfigService.CarregarConfiguracaoFirebird();
+            StringBuilder scriptMySQL = new StringBuilder();
+
+            LogService.RegistrarLog("INFO", $"🔄 Iniciando a geração do script.");
+
+            await Task.Run(() =>
+            {
+                int progresso = 0;
+                foreach (string linha in txtLog.Lines)
+                {
+                    if (!linha.StartsWith("- ")) continue;
+                    string tabela = linha.Substring(2).Trim();
+
+                    scriptMySQL.AppendLine($"-- Criar tabela {tabela} no MySQL");
+                    scriptMySQL.AppendLine(ScriptGeneratorService.GerarScriptFirebirdParaMySQL(tabela, firebirdDSN));
+                    scriptMySQL.AppendLine();
+
+                    progresso++;
+                    Invoke(new Action(() => pbMigracao.Value = progresso));
+                }
+            });
+
+            try
+            {
+                File.WriteAllText(caminhoMySQL, scriptMySQL.ToString(), Encoding.UTF8);
+                MessageBox.Show($"🚀 Scripts gerados com sucesso!{Environment.NewLine}📄 {caminhoMySQL}", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LogService.RegistrarLog("SUCCESS", $"🚀 Scripts gerados com sucesso!{Environment.NewLine}📄 {caminhoMySQL}");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"❌ Erro ao salvar os arquivos de script: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                LogService.RegistrarLog("ERRO", $"❌ Erro ao salvar os arquivos de script: {ex.Message}");
+            }
+            finally
+            {
+                pbMigracao.Visible = false;
+                btnMigrar.Enabled = true;
+                btnVerificarTabelas.Enabled = true;
+                btnVerificarEstrutura.Enabled = true;
+                btnGerarScripts.Enabled = true;
             }
         }
 
@@ -124,7 +280,7 @@ namespace BlackSync.Forms
         private async void btnMigrar_Click(object sender, EventArgs e)
         {
             LogService.RegistrarLog(
-                "INFO", 
+                "INFO",
                 $"🔄 Limpando o Log Verificação"
             );
             txtLog.Clear();
@@ -135,22 +291,25 @@ namespace BlackSync.Forms
             if (tabelasSelecionadas.Count == 0)
             {
                 MessageBox.Show(
-                    "Por favor, selecione ao menos uma tabela para migrar.", 
-                    "Aviso", 
-                    MessageBoxButtons.OK, 
+                    "Por favor, selecione ao menos uma tabela para migrar.",
+                    "Aviso",
+                    MessageBoxButtons.OK,
                     MessageBoxIcon.Warning
                 );
                 return;
             }
 
             LogService.RegistrarLog(
-                "INFO", 
+                "INFO",
                 $"🔄 Iniciando migração de {tabelasSelecionadas.Count} tabelas."
             );
             txtLog.AppendText($"🔄 Iniciando migração de {tabelasSelecionadas.Count} tabelas...{Environment.NewLine}");
 
             pbMigracao.Visible = true;
             btnMigrar.Enabled = false;
+            btnVerificarTabelas.Enabled = false;
+            btnVerificarEstrutura.Enabled = false;
+            btnGerarScripts.Enabled = false;
 
             // 🔹 Obtém o total de registros antes de iniciar a migração
             int totalRegistros = _firebirdService.ObterTotalRegistros(tabelasSelecionadas);
@@ -250,21 +409,21 @@ namespace BlackSync.Forms
                         {
                             _firebirdService.AtualizarEnviado(tabela);
 
-                                LogService.RegistrarLog("INFO", $"📤 Registros atualizados como enviados no Firebird para {tabela}.");
-                                Invoke(new Action(() => txtLog.AppendText($"📤 Registros atualizados como enviados no Firebird para {tabela}.{Environment.NewLine}")));
+                            LogService.RegistrarLog("INFO", $"📤 Registros atualizados como enviados no Firebird para {tabela}.");
+                            Invoke(new Action(() => txtLog.AppendText($"📤 Registros atualizados como enviados no Firebird para {tabela}.{Environment.NewLine}")));
                         }
 
                         if (_mySQLService.ColunaExiste(tabela, "Enviado"))
                         {
-                           _mySQLService.AtualizarEnviado(tabela);
+                            _mySQLService.AtualizarEnviado(tabela);
 
-                                LogService.RegistrarLog("SUCCESS", $"📤 Registros atualizados como enviados no MySQL para {tabela}.");
-                                Invoke(new Action(() => txtLog.AppendText($"📤 Registros atualizados como enviados no MySQL para {tabela}.{Environment.NewLine}")));
+                            LogService.RegistrarLog("SUCCESS", $"📤 Registros atualizados como enviados no MySQL para {tabela}.");
+                            Invoke(new Action(() => txtLog.AppendText($"📤 Registros atualizados como enviados no MySQL para {tabela}.{Environment.NewLine}")));
                         }
                     }
                     catch (Exception ex)
                     {
-                        LogService.RegistrarLog("ERROR", $"Erro ao migrar {tabela}: {ex.Message}");
+                        LogService.RegistrarLog("ERROR", $"❌ Erro ao migrar {tabela}: {ex.Message}");
                         Invoke(new Action(() => txtLog.AppendText($"❌ Erro ao migrar {tabela}: {ex.Message}{Environment.NewLine}")));
                     }
                 }
@@ -273,7 +432,15 @@ namespace BlackSync.Forms
             LogService.RegistrarLog("INFO", $"🎉 Migração concluída!");
             pbMigracao.Visible = false;
             btnMigrar.Enabled = true;
+            btnVerificarTabelas.Enabled = true;
+            btnVerificarEstrutura.Enabled = true;
+            btnGerarScripts.Enabled = true;
             txtLog.AppendText($"🎉 Migração concluída!{Environment.NewLine}");
+        }
+
+        private void lbDivisor1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

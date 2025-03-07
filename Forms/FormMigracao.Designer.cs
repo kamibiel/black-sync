@@ -30,15 +30,15 @@
         {
             gbFirebirdM = new GroupBox();
             clbTabelasFirebird = new CheckedListBox();
-            gbMySQLM = new GroupBox();
-            clbTabelasMySQL = new CheckedListBox();
             cbMarcarTodas = new CheckBox();
             pbMigracao = new ProgressBar();
             gbLog = new GroupBox();
             txtLog = new TextBox();
             btnMigrar = new Button();
+            btnVerificarTabelas = new Button();
+            btnVerificarEstrutura = new Button();
+            btnGerarScripts = new Button();
             gbFirebirdM.SuspendLayout();
-            gbMySQLM.SuspendLayout();
             gbLog.SuspendLayout();
             SuspendLayout();
             // 
@@ -46,9 +46,9 @@
             // 
             gbFirebirdM.Controls.Add(clbTabelasFirebird);
             gbFirebirdM.Font = new Font("Arial", 12F, FontStyle.Bold);
-            gbFirebirdM.Location = new Point(12, 12);
+            gbFirebirdM.Location = new Point(54, 12);
             gbFirebirdM.Name = "gbFirebirdM";
-            gbFirebirdM.Size = new Size(184, 223);
+            gbFirebirdM.Size = new Size(222, 223);
             gbFirebirdM.TabIndex = 0;
             gbFirebirdM.TabStop = false;
             gbFirebirdM.Text = "Tabelas Firebird";
@@ -59,34 +59,14 @@
             clbTabelasFirebird.FormattingEnabled = true;
             clbTabelasFirebird.Location = new Point(6, 18);
             clbTabelasFirebird.Name = "clbTabelasFirebird";
-            clbTabelasFirebird.Size = new Size(172, 199);
+            clbTabelasFirebird.Size = new Size(210, 199);
             clbTabelasFirebird.TabIndex = 0;
-            // 
-            // gbMySQLM
-            // 
-            gbMySQLM.Controls.Add(clbTabelasMySQL);
-            gbMySQLM.Font = new Font("Arial", 12F, FontStyle.Bold);
-            gbMySQLM.Location = new Point(202, 12);
-            gbMySQLM.Name = "gbMySQLM";
-            gbMySQLM.Size = new Size(184, 223);
-            gbMySQLM.TabIndex = 1;
-            gbMySQLM.TabStop = false;
-            gbMySQLM.Text = "Tabelas MySQL";
-            // 
-            // clbTabelasMySQL
-            // 
-            clbTabelasMySQL.Font = new Font("Arial", 8.25F);
-            clbTabelasMySQL.FormattingEnabled = true;
-            clbTabelasMySQL.Location = new Point(6, 18);
-            clbTabelasMySQL.Name = "clbTabelasMySQL";
-            clbTabelasMySQL.Size = new Size(172, 199);
-            clbTabelasMySQL.TabIndex = 1;
             // 
             // cbMarcarTodas
             // 
             cbMarcarTodas.AutoSize = true;
             cbMarcarTodas.Font = new Font("Arial", 9.75F);
-            cbMarcarTodas.Location = new Point(11, 240);
+            cbMarcarTodas.Location = new Point(51, 241);
             cbMarcarTodas.Name = "cbMarcarTodas";
             cbMarcarTodas.Size = new Size(187, 20);
             cbMarcarTodas.TabIndex = 2;
@@ -96,16 +76,16 @@
             // 
             // pbMigracao
             // 
-            pbMigracao.Location = new Point(202, 243);
+            pbMigracao.Location = new Point(54, 267);
             pbMigracao.Name = "pbMigracao";
-            pbMigracao.Size = new Size(184, 10);
+            pbMigracao.Size = new Size(372, 10);
             pbMigracao.TabIndex = 3;
             // 
             // gbLog
             // 
             gbLog.Controls.Add(txtLog);
             gbLog.Font = new Font("Arial", 12F, FontStyle.Bold);
-            gbLog.Location = new Point(11, 268);
+            gbLog.Location = new Point(51, 281);
             gbLog.Name = "gbLog";
             gbLog.Size = new Size(375, 153);
             gbLog.TabIndex = 4;
@@ -126,30 +106,67 @@
             // 
             btnMigrar.FlatStyle = FlatStyle.Flat;
             btnMigrar.Font = new Font("Arial", 9.75F);
-            btnMigrar.Location = new Point(11, 427);
+            btnMigrar.Location = new Point(299, 57);
             btnMigrar.Name = "btnMigrar";
-            btnMigrar.Size = new Size(127, 37);
+            btnMigrar.Size = new Size(121, 37);
             btnMigrar.TabIndex = 5;
             btnMigrar.Text = "Migrar tabelas";
             btnMigrar.UseVisualStyleBackColor = true;
             btnMigrar.Click += btnMigrar_Click;
+            // 
+            // btnVerificarTabelas
+            // 
+            btnVerificarTabelas.FlatStyle = FlatStyle.Flat;
+            btnVerificarTabelas.Font = new Font("Arial", 9.75F);
+            btnVerificarTabelas.Location = new Point(299, 100);
+            btnVerificarTabelas.Name = "btnVerificarTabelas";
+            btnVerificarTabelas.Size = new Size(121, 37);
+            btnVerificarTabelas.TabIndex = 6;
+            btnVerificarTabelas.Text = "Verificar tabelas";
+            btnVerificarTabelas.UseVisualStyleBackColor = true;
+            btnVerificarTabelas.Click += btnVerificarTabelas_Click;
+            // 
+            // btnVerificarEstrutura
+            // 
+            btnVerificarEstrutura.FlatStyle = FlatStyle.Flat;
+            btnVerificarEstrutura.Font = new Font("Arial", 9.75F);
+            btnVerificarEstrutura.Location = new Point(299, 143);
+            btnVerificarEstrutura.Name = "btnVerificarEstrutura";
+            btnVerificarEstrutura.Size = new Size(121, 37);
+            btnVerificarEstrutura.TabIndex = 19;
+            btnVerificarEstrutura.Text = "Verificar estrutura";
+            btnVerificarEstrutura.UseVisualStyleBackColor = true;
+            // 
+            // btnGerarScripts
+            // 
+            btnGerarScripts.FlatAppearance.BorderColor = Color.Red;
+            btnGerarScripts.FlatStyle = FlatStyle.Flat;
+            btnGerarScripts.Font = new Font("Arial", 9.75F);
+            btnGerarScripts.Location = new Point(142, 440);
+            btnGerarScripts.Name = "btnGerarScripts";
+            btnGerarScripts.Size = new Size(182, 41);
+            btnGerarScripts.TabIndex = 20;
+            btnGerarScripts.Text = "Gerar Scripts";
+            btnGerarScripts.UseVisualStyleBackColor = true;
+            btnGerarScripts.Click += btnGerarScripts_Click;
             // 
             // FormMigracao
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.DimGray;
-            ClientSize = new Size(393, 481);
+            ClientSize = new Size(474, 493);
+            Controls.Add(btnGerarScripts);
+            Controls.Add(btnVerificarEstrutura);
+            Controls.Add(btnVerificarTabelas);
             Controls.Add(btnMigrar);
             Controls.Add(gbLog);
             Controls.Add(pbMigracao);
             Controls.Add(cbMarcarTodas);
-            Controls.Add(gbMySQLM);
             Controls.Add(gbFirebirdM);
             Name = "FormMigracao";
             Text = "FormMigracao";
             gbFirebirdM.ResumeLayout(false);
-            gbMySQLM.ResumeLayout(false);
             gbLog.ResumeLayout(false);
             gbLog.PerformLayout();
             ResumeLayout(false);
@@ -159,13 +176,14 @@
         #endregion
 
         private GroupBox gbFirebirdM;
-        private GroupBox gbMySQLM;
         private CheckBox cbMarcarTodas;
         private ProgressBar pbMigracao;
         private GroupBox gbLog;
         private Button btnMigrar;
         private TextBox txtLog;
         private CheckedListBox clbTabelasFirebird;
-        private CheckedListBox clbTabelasMySQL;
+        private Button btnVerificarTabelas;
+        private Button btnVerificarEstrutura;
+        private Button btnGerarScripts;
     }
 }

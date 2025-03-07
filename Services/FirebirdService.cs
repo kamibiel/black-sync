@@ -1,4 +1,5 @@
 ﻿using FirebirdSql.Data.FirebirdClient;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -589,6 +590,58 @@ namespace BlackSync.Services
             catch (Exception ex)
             {
                 LogService.RegistrarLog("ERROR", $"❌ Erro ao atualizar a filial na tabela {tabela} (Firebird): {ex.Message}");
+            }
+        }
+
+        public void AlterarDocumentoFirebird(string tabela, int xEmpresa, int yEmpresa)
+        {
+            try
+            {
+                using (var conn = new OdbcConnection(connectionString))
+                {
+                    conn.Open();
+
+                    // Mapeamento das colunas
+                    Dictionary<string, string> colunasDocumento = new Dictionary<string, string>
+                    {
+                        { "baixapagar", "documento" },
+                        { "baixareceber", "documento" },
+                        { "contacartao", "documento" },
+                        { "pagar", "documento" },
+                        { "receber", "documento" },
+                        { "caixa", "pedido" },
+                        { "notafiscal", "pedido" },
+                        { "pedidosvenda", "documento" },
+                        { "itenspedidovenda", "documento" },
+                        { "movestoque", "documento" },
+                        { "nfentrada", "documento" },
+                        { "itemnfentrada", "documento" }
+                    };
+
+                    if (!colunasDocumento.ContainsKey(tabela))
+                    {
+                        LogService.RegistrarLog("ERROR", $"⚠️ Tabela {tabela} não possui uma coluna de documento definida.");
+                        return;
+                    }
+
+                    string colunaDocumento = colunasDocumento[tabela];
+
+                    // Formata a query diretamente para evitar problemas com o REPLACE()
+                    string query = $@"
+                    UPDATE {tabela}
+                    SET {colunaDocumento} = REPLACE(REPLACE({colunaDocumento}, 'P{xEmpresa}', 'P{yEmpresa}'), 'F{xEmpresa}', 'F{yEmpresa}')
+                    WHERE {colunaDocumento} LIKE 'P{xEmpresa}%' OR {colunaDocumento} LIKE 'F{xEmpresa}%'";
+
+                    using (var cmd = new OdbcCommand(query, conn))
+                    {
+                        int linhasAfetadas = cmd.ExecuteNonQuery();
+                        LogService.RegistrarLog("INFO", $"✅ {linhasAfetadas} registros alterados na tabela {tabela} (Firebird).");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogService.RegistrarLog("ERROR", $"❌ Erro ao alterar a numeração do documento na tabela {tabela} (Firebird): {ex.Message}");
             }
         }
     }

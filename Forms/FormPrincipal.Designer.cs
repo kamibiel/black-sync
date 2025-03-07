@@ -31,7 +31,6 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormPrincipal));
             tabControlPrincipal = new TabControl();
             tabConfig = new TabPage();
-            tabVerificacao = new TabPage();
             tabEstrutura = new TabPage();
             tabMigracao = new TabPage();
             tabManutencao = new TabPage();
@@ -43,7 +42,6 @@
             // 
             resources.ApplyResources(tabControlPrincipal, "tabControlPrincipal");
             tabControlPrincipal.Controls.Add(tabConfig);
-            tabControlPrincipal.Controls.Add(tabVerificacao);
             tabControlPrincipal.Controls.Add(tabEstrutura);
             tabControlPrincipal.Controls.Add(tabMigracao);
             tabControlPrincipal.Controls.Add(tabManutencao);
@@ -61,12 +59,6 @@
             tabConfig.ForeColor = SystemColors.ControlText;
             tabConfig.Name = "tabConfig";
             tabConfig.Click += tabConfig_Click;
-            // 
-            // tabVerificacao
-            // 
-            resources.ApplyResources(tabVerificacao, "tabVerificacao");
-            tabVerificacao.BackColor = Color.DimGray;
-            tabVerificacao.Name = "tabVerificacao";
             // 
             // tabEstrutura
             // 
@@ -99,6 +91,7 @@
             BackColor = Color.DimGray;
             Controls.Add(tabControlPrincipal);
             FormBorderStyle = FormBorderStyle.FixedToolWindow;
+            IsMdiContainer = true;
             Name = "FormPrincipal";
             ShowInTaskbar = false;
             Load += FormPrincipal_Load;
@@ -112,7 +105,6 @@
         private TabPage tabConfig;
         private TabPage tabMigracao;
         private TabPage tabLog;
-        private TabPage tabVerificacao;
         private TabPage tabEstrutura;
         private TabPage tabManutencao;
     }

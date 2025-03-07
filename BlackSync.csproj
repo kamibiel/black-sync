@@ -8,7 +8,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Platforms>AnyCPU;x86;x64</Platforms>
     <Configurations>Debug;Release;Debug_x64</Configurations>
+    <ApplicationIcon>icone.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="icone.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Models\" />

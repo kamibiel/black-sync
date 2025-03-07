@@ -89,11 +89,13 @@ namespace BlackSync.Forms
             // Log e mensagem ao usuário
             LogService.RegistrarLog("SUCCESS", $"✅ Configurações de MySQL e Firebird salvas com sucesso!");
             MessageBox.Show(
-                "Configurações de MySQL e Firebird salvas com sucesso!", 
-                "Sucesso", 
-                MessageBoxButtons.OK, 
+                "Configurações de MySQL e Firebird salvas com sucesso!",
+                "Sucesso",
+                MessageBoxButtons.OK,
                 MessageBoxIcon.Information
             );
+
+            _formPrincipal.TabControlPrincipal.SelectedTab = _formPrincipal.TabControlPrincipal.TabPages["tabVerificacao"];
         }
 
         private void txtServidorFirebird_Click(object sender, EventArgs e)
@@ -111,6 +113,11 @@ namespace BlackSync.Forms
         private void FormConfig_Load(object sender, EventArgs e)
         {
             // Código para inicialização do form, se necessário
+        }
+
+        private void txtDSN_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
