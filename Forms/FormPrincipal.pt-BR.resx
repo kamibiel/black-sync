@@ -124,15 +124,6 @@
   <data name="tabConfig.Size" type="System.Drawing.Size, System.Drawing">
     <value>576, 628</value>
   </data>
-  <data name="tabEstrutura.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Arial, 12pt, style=Bold</value>
-  </data>
-  <data name="tabEstrutura.Size" type="System.Drawing.Size, System.Drawing">
-    <value>576, 628</value>
-  </data>
-  <data name="tabEstrutura.Text" xml:space="preserve">
-    <value>Estrutura</value>
-  </data>
   <data name="tabMigracao.Font" type="System.Drawing.Font, System.Drawing">
     <value>Arial, 11.25pt, style=Bold</value>
   </data>
@@ -753,10 +744,6 @@
         4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg
         4ODg4ODg4ODg4ODg4ODg4ODg4ODg4OD4ReL/AQzM/gLYed4dAAAAAElFTkSuQmCC
 </value>
-  </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="$this.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>BlackSync - Migração de Dados entre MySQL e Firebird</value>

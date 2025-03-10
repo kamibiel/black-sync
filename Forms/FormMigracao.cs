@@ -20,6 +20,8 @@ namespace BlackSync.Forms
         private readonly FirebirdService _firebirdService;
         private readonly FormPrincipal _formPrincipal;
         private List<string> _tabelasMySQL = new List<string>();
+        private List<string> _tabelasParaCriar = new List<string>();
+        private List<string> _tabelasComErro = new List<string>();
 
         public FormMigracao(
             FormPrincipal formprincipal, 
@@ -59,13 +61,7 @@ namespace BlackSync.Forms
                 MessageBox.Show($"Erro ao carregar tabelas: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 LogService.RegistrarLog("ERRO", $"❌ Erro ao carregar tabelas: {ex.Message}");
             }
-        }       
-
-        private void btnVerificarTabelas_Click(Object sender, EventArgs e)
-        {
-            CarregarTabelasMySQL();
-            CompararTabelas();
-        }
+        } 
 
         private void CarregarTabelasMySQL()
         {
@@ -97,119 +93,7 @@ namespace BlackSync.Forms
                 LogService.RegistrarLog("ERRO", $"❌ Erro ao carregar tabelas do MySQL: {ex.Message}");
                 MessageBox.Show($"❌ Erro ao carregar tabelas do MySQL: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }
-
-        private void CompararTabelas()
-        {
-            List<string> tabelasFirebird = clbTabelasFirebird.Items.Cast<string>().Select(t => t.ToUpper()).ToList();
-            List<string> apenasNoFirebird = tabelasFirebird.Except(_tabelasMySQL).ToList(); // Filtra as tabelas que estão no Firebird e não no MySQL
-
-            LogService.RegistrarLog("INFO", $"🔄 Limpando o Log Verificação");
-            txtLog.Clear(); // Limpa o log para exibir os novos resultados
-
-            LogService.RegistrarLog("INFO", $"🔄 Iniciando a verificação das tabelas.");
-
-            if (apenasNoFirebird.Count > 0)
-            {
-                LogService.RegistrarLog("INFO", $"📤 Comparando total de {apenasNoFirebird.Count} tabelas.");
-                txtLog.AppendText($"⚠️ Tabelas que estão no Firebird e não no MySQL:{Environment.NewLine}");
-
-                for (int i = 0; i < clbTabelasFirebird.Items.Count; i++)
-                {
-                    string tabela = clbTabelasFirebird.Items[i].ToString().Trim().ToUpper();
-
-                    if (apenasNoFirebird.Contains(tabela))
-                    {
-                        clbTabelasFirebird.SetItemChecked(i, true); // Marca as tabelas que precisam ser criadas no MySQL
-                        txtLog.AppendText($"- {tabela}{Environment.NewLine}");
-                    }
-                    else
-                    {
-                        clbTabelasFirebird.SetItemChecked(i, false); // Desmarca as que já existem no MySQL
-                    }
-                }
-            }
-            else
-            {
-                LogService.RegistrarLog("INFO", $"✅ Todas as tabelas já existem no MySQL.");
-                txtLog.AppendText($"✅ Todas as tabelas já existem no MySQL.{Environment.NewLine}");
-            }
-
-            LogService.RegistrarLog("INFO", $"🎉 Comparação concluída.");
-        }
-
-        private async void btnGerarScripts_Click(object sender, EventArgs e)
-        {
-            if (txtLog.Text.Contains("✅ Todas as tabelas já existem no MySQL"))
-            {
-                MessageBox.Show("✅ Nenhuma tabela para gerar script.", "Informação", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                LogService.RegistrarLog("INFO", $"✅ Nenhuma tabela para gerar script.");
-                return;
-            }
-
-            SaveFileDialog saveFileDialog = new SaveFileDialog
-            {
-                Title = "Salvar Script MySQL",
-                Filter = "Arquivo SQL (*.sql)|*.sql",
-                DefaultExt = "sql",
-                FileName = "script-mysql-verificacao.sql"
-            };
-
-            if (saveFileDialog.ShowDialog() != DialogResult.OK)
-            {
-                return;
-            }
-
-            string caminhoMySQL = saveFileDialog.FileName;
-            pbMigracao.Visible = true;
-            pbMigracao.Value = 0;
-            btnMigrar.Enabled = false;
-            btnVerificarTabelas.Enabled = false;
-            btnVerificarEstrutura.Enabled = false;
-            btnGerarScripts.Enabled = false;
-
-            string firebirdDSN = ConfigService.CarregarConfiguracaoFirebird();
-            StringBuilder scriptMySQL = new StringBuilder();
-
-            LogService.RegistrarLog("INFO", $"🔄 Iniciando a geração do script.");
-
-            await Task.Run(() =>
-            {
-                int progresso = 0;
-                foreach (string linha in txtLog.Lines)
-                {
-                    if (!linha.StartsWith("- ")) continue;
-                    string tabela = linha.Substring(2).Trim();
-
-                    scriptMySQL.AppendLine($"-- Criar tabela {tabela} no MySQL");
-                    scriptMySQL.AppendLine(ScriptGeneratorService.GerarScriptFirebirdParaMySQL(tabela, firebirdDSN));
-                    scriptMySQL.AppendLine();
-
-                    progresso++;
-                    Invoke(new Action(() => pbMigracao.Value = progresso));
-                }
-            });
-
-            try
-            {
-                File.WriteAllText(caminhoMySQL, scriptMySQL.ToString(), Encoding.UTF8);
-                MessageBox.Show($"🚀 Scripts gerados com sucesso!{Environment.NewLine}📄 {caminhoMySQL}", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                LogService.RegistrarLog("SUCCESS", $"🚀 Scripts gerados com sucesso!{Environment.NewLine}📄 {caminhoMySQL}");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"❌ Erro ao salvar os arquivos de script: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                LogService.RegistrarLog("ERRO", $"❌ Erro ao salvar os arquivos de script: {ex.Message}");
-            }
-            finally
-            {
-                pbMigracao.Visible = false;
-                btnMigrar.Enabled = true;
-                btnVerificarTabelas.Enabled = true;
-                btnVerificarEstrutura.Enabled = true;
-                btnGerarScripts.Enabled = true;
-            }
-        }
+        }      
 
         private void cbMarcarTodas_CheckedChanged(object sender, EventArgs e)
         {
@@ -228,48 +112,6 @@ namespace BlackSync.Forms
 
             // Reativa o evento
             clbTabelasFirebird.ItemCheck += clbTabelasFirebird_ItemCheck;
-        }
-
-        private void clbTabelasFirebird_ItemCheck(object sender, ItemCheckEventArgs e)
-        {
-            this.BeginInvoke((MethodInvoker)delegate
-            {
-                int totalItens = clbTabelasFirebird.Items.Count;
-                int itensSelecionados = 0;
-
-                // Conta os itens já selecionados e adiciona a mudança atual do evento
-                for (int i = 0; i < totalItens; i++)
-                {
-                    if (clbTabelasFirebird.GetItemCheckState(i) == CheckState.Checked || (i == e.Index && e.NewValue == CheckState.Checked))
-                    {
-                        itensSelecionados++;
-                    }
-                }
-
-                // Temporariamente desativa o evento para evitar loops
-                cbMarcarTodas.CheckedChanged -= cbMarcarTodas_CheckedChanged;
-
-                // Atualiza o estado do checkbox principal
-                if (itensSelecionados == totalItens)
-                {
-                    cbMarcarTodas.Checked = true;
-                    cbMarcarTodas.Text = "Desmarcar todas as tabelas";
-                }
-                else if (itensSelecionados == 0)
-                {
-                    cbMarcarTodas.Checked = false;
-                    cbMarcarTodas.Text = "Selecionar todas as tabelas";
-                }
-                else
-                {
-                    cbMarcarTodas.Checked = false;
-                    cbMarcarTodas.CheckState = CheckState.Indeterminate; // Estado intermediário
-                    cbMarcarTodas.Text = "Desmarcar todas as tabelas";
-                }
-
-                // Reativa o evento do checkbox
-                cbMarcarTodas.CheckedChanged += cbMarcarTodas_CheckedChanged;
-            });
         }
 
         private List<string> ObterTabelasSelecionadas()
@@ -438,6 +280,215 @@ namespace BlackSync.Forms
             txtLog.AppendText($"🎉 Migração concluída!{Environment.NewLine}");
         }
 
+        private void btnVerificarTabelas_Click(Object sender, EventArgs e)
+        {
+            CarregarTabelasMySQL();
+            CompararTabelas();
+        }
+
+        private void btnVerificarEstrutura_Click(object sender, EventArgs e)
+        {
+            VerificarEstruturaTabelas();
+        }        
+
+        private void CompararTabelas()
+        {
+            List<string> tabelasFirebird = clbTabelasFirebird.Items.Cast<string>().Select(t => t.ToUpper()).ToList();
+            List<string> apenasNoFirebird = tabelasFirebird.Except(_tabelasMySQL).ToList(); // Filtra as tabelas que estão no Firebird e não no MySQL
+
+            txtLog.Clear();
+            _tabelasComErro.Clear();
+            _tabelasParaCriar.Clear();
+
+            LogService.RegistrarLog("INFO", $"🔄 Iniciando a verificação das tabelas.");
+
+            if (apenasNoFirebird.Count > 0)
+            {
+                _tabelasParaCriar.AddRange(apenasNoFirebird);
+                txtLog.AppendText($"⚠️ Tabelas que estão no Firebird e não no MySQL:{Environment.NewLine}");
+
+                foreach (var tabela in apenasNoFirebird)
+                {
+                    txtLog.AppendText($"- {tabela}{Environment.NewLine}");
+                }
+            }
+            else
+            {
+                txtLog.AppendText($"✅ Todas as tabelas já existem no MySQL.{Environment.NewLine}");
+            }
+
+            LogService.RegistrarLog("INFO", $"🎉 Comparação concluída.");
+        }
+
+        private async Task VerificarEstruturaTabelas()
+        {
+            StringBuilder resultado = new StringBuilder();
+            
+            var tabelasSelecionadas = ObterTabelasSelecionadas();
+
+            if (tabelasSelecionadas.Count == 0)
+            {
+                MessageBox.Show("Por favor, selecione ao menos uma tabela para verificar a estrutura.",
+                                "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            pbMigracao.Visible = true;
+            pbMigracao.Value = 0;
+            pbMigracao.Maximum = tabelasSelecionadas.Count;
+
+            LogService.RegistrarLog("INFO", $"📥 Limpando as tabelas com erro.");
+            txtLog.Clear();
+            _tabelasComErro.Clear();
+            _tabelasParaCriar.Clear();
+
+            await Task.Run(() =>
+            {
+                foreach (var tabela in tabelasSelecionadas)
+                {
+                    var estruturaMySQL = _mySQLService.ObterEstruturaTabela(tabela);
+
+                    if (estruturaMySQL == null || estruturaMySQL.Count == 0) // 🔹 Se a tabela NÃO EXISTE no MySQL
+                    {
+                        _tabelasParaCriar.Add(tabela);
+                        resultado.AppendLine($"🚨 Tabela {tabela} **NÃO EXISTE** no MySQL e precisa ser criada.");
+                    }
+                    else
+                    {
+                        var colunasFaltantes = _firebirdService.CompararEstrutura(tabela, _mySQLService);
+
+                        if (colunasFaltantes.Any()) // 🔹 Se existem colunas faltando, precisa de ajustes
+                        {
+                            _tabelasComErro.Add(tabela);
+                            resultado.AppendLine($"❌ Tabela {tabela} precisa de ajustes! {colunasFaltantes.Count} colunas faltando.");
+                        }
+                    }
+
+                    Invoke(new Action(() => pbMigracao.Value++));
+                }
+            });
+
+            // Atualizar a lista de tabelas no clbTabelasFirebird sem limpar completamente
+            Invoke(new Action(() =>
+            {
+                for (int i = 0; i < clbTabelasFirebird.Items.Count; i++)
+                {
+                    string tabela = clbTabelasFirebird.Items[i].ToString();
+                    clbTabelasFirebird.SetItemChecked(i, _tabelasComErro.Contains(tabela));
+                }
+            }));  
+
+            pbMigracao.Visible = false;       
+
+            if (_tabelasParaCriar.Count > 0 || _tabelasComErro.Count > 0)
+            {
+                txtLog.AppendText(resultado.ToString());
+            }
+            else
+            {
+                txtLog.AppendText($"✅ Estrutura do MySQL compatível.{Environment.NewLine}");
+            }
+
+        }
+
+        private async void btnGerarScripts_Click(object sender, EventArgs e)
+        {
+            if (_tabelasParaCriar.Count == 0 && _tabelasComErro.Count == 0)
+            {
+                MessageBox.Show("Nenhuma tabela precisa ser corrigida ou criada!", "Informação", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            StringBuilder scriptFinal = new StringBuilder();
+            string firebirdDSN = ConfigService.CarregarConfiguracaoFirebird();
+
+            pbMigracao.Visible = true;
+            pbMigracao.Value = 0;
+            pbMigracao.Maximum = _tabelasParaCriar.Count + _tabelasComErro.Count;
+
+            await Task.Run(() =>
+            {
+                foreach (var tabela in _tabelasParaCriar)
+                {
+                    scriptFinal.AppendLine($"-- Criar tabela {tabela} no MySQL");
+                    scriptFinal.AppendLine(ScriptGeneratorService.GerarScriptFirebirdParaMySQL(tabela, firebirdDSN));
+
+                    Invoke(new Action(() => pbMigracao.Value++));
+                }
+
+                foreach (var tabela in _tabelasComErro)
+                {
+                    var colunasFaltantes = _firebirdService.CompararEstrutura(tabela, _mySQLService);
+                    string alterScript = ScriptGeneratorService.GerarScriptAlteracao(tabela, colunasFaltantes);
+                    scriptFinal.AppendLine(alterScript);
+
+                    Invoke(new Action(() => pbMigracao.Value++));
+                }
+            });
+
+            SalvarScript(scriptFinal);
+            pbMigracao.Visible = false;
+        }
+
+        private void SalvarScript(StringBuilder script)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Title = "Salvar Script MySQL",
+                Filter = "Arquivo SQL (*.sql)|*.sql",
+                DefaultExt = "sql",
+                FileName = "script-mysql-ajustes.sql"
+            };
+
+            if (saveFileDialog.ShowDialog() != DialogResult.OK)
+                return;
+
+            File.WriteAllText(saveFileDialog.FileName, script.ToString(), Encoding.UTF8);
+            MessageBox.Show("Script salvo com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+     
+        private void clbTabelasFirebird_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            this.BeginInvoke((MethodInvoker)delegate
+            {
+                int totalItens = clbTabelasFirebird.Items.Count;
+                int itensSelecionados = 0;
+
+                // Conta os itens já selecionados e adiciona a mudança atual do evento
+                for (int i = 0; i < totalItens; i++)
+                {
+                    if (clbTabelasFirebird.GetItemCheckState(i) == CheckState.Checked || (i == e.Index && e.NewValue == CheckState.Checked))
+                    {
+                        itensSelecionados++;
+                    }
+                }
+
+                // Temporariamente desativa o evento para evitar loops
+                cbMarcarTodas.CheckedChanged -= cbMarcarTodas_CheckedChanged;
+
+                // Atualiza o estado do checkbox principal
+                if (itensSelecionados == totalItens)
+                {
+                    cbMarcarTodas.Checked = true;
+                    cbMarcarTodas.Text = "Desmarcar todas as tabelas";
+                }
+                else if (itensSelecionados == 0)
+                {
+                    cbMarcarTodas.Checked = false;
+                    cbMarcarTodas.Text = "Selecionar todas as tabelas";
+                }
+                else
+                {
+                    cbMarcarTodas.Checked = false;
+                    cbMarcarTodas.CheckState = CheckState.Indeterminate; // Estado intermediário
+                    cbMarcarTodas.Text = "Desmarcar todas as tabelas";
+                }
+
+                // Reativa o evento do checkbox
+                cbMarcarTodas.CheckedChanged += cbMarcarTodas_CheckedChanged;
+            });
+        }
+        
         private void lbDivisor1_Click(object sender, EventArgs e)
         {
 

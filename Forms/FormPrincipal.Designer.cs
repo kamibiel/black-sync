@@ -31,7 +31,6 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormPrincipal));
             tabControlPrincipal = new TabControl();
             tabConfig = new TabPage();
-            tabEstrutura = new TabPage();
             tabMigracao = new TabPage();
             tabManutencao = new TabPage();
             tabLog = new TabPage();
@@ -42,7 +41,6 @@
             // 
             resources.ApplyResources(tabControlPrincipal, "tabControlPrincipal");
             tabControlPrincipal.Controls.Add(tabConfig);
-            tabControlPrincipal.Controls.Add(tabEstrutura);
             tabControlPrincipal.Controls.Add(tabMigracao);
             tabControlPrincipal.Controls.Add(tabManutencao);
             tabControlPrincipal.Controls.Add(tabLog);
@@ -59,12 +57,6 @@
             tabConfig.ForeColor = SystemColors.ControlText;
             tabConfig.Name = "tabConfig";
             tabConfig.Click += tabConfig_Click;
-            // 
-            // tabEstrutura
-            // 
-            resources.ApplyResources(tabEstrutura, "tabEstrutura");
-            tabEstrutura.BackColor = Color.DimGray;
-            tabEstrutura.Name = "tabEstrutura";
             // 
             // tabMigracao
             // 
@@ -105,7 +97,6 @@
         private TabPage tabConfig;
         private TabPage tabMigracao;
         private TabPage tabLog;
-        private TabPage tabEstrutura;
         private TabPage tabManutencao;
     }
 }

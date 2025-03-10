@@ -100,7 +100,7 @@ namespace BlackSync.Forms
 
             AdicionarFormularioAba(new FormConfig(this), tabConfig);
             // AdicionarFormularioAba(new FormVerificacao(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabVerificacao);
-            AdicionarFormularioAba(new FormEstrutura(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabEstrutura);
+            // AdicionarFormularioAba(new FormEstrutura(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabEstrutura);
             AdicionarFormularioAba(new FormMigracao(this, mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabMigracao);
             AdicionarFormularioAba(new FormGestaoBancoDados(this, mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabManutencao);
             AdicionarFormularioAba(new FormLogs(), tabLog);
@@ -122,7 +122,7 @@ namespace BlackSync.Forms
         public void AtualizarFormularios()
         {
             //tabVerificacao.Controls.Clear();
-            tabEstrutura.Controls.Clear();
+            //tabEstrutura.Controls.Clear();
             tabMigracao.Controls.Clear();
             tabManutencao.Controls.Clear();
             tabLog.Controls.Clear();
@@ -135,7 +135,7 @@ namespace BlackSync.Forms
 
             // Recria os formulários com as novas configurações
             //AdicionarFormularioAba(new FormVerificacao(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabVerificacao);
-            AdicionarFormularioAba(new FormEstrutura(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabEstrutura);
+            //AdicionarFormularioAba(new FormEstrutura(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabEstrutura);
             AdicionarFormularioAba(new FormMigracao(this, mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabMigracao);
             AdicionarFormularioAba(new FormGestaoBancoDados(this, mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabManutencao);
             AdicionarFormularioAba(new FormLogs(), tabLog);

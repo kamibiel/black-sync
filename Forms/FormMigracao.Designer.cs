@@ -136,6 +136,7 @@
             btnVerificarEstrutura.TabIndex = 19;
             btnVerificarEstrutura.Text = "Verificar estrutura";
             btnVerificarEstrutura.UseVisualStyleBackColor = true;
+            btnVerificarEstrutura.Click += btnVerificarEstrutura_Click;
             // 
             // btnGerarScripts
             // 
