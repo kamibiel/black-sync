@@ -11,17 +11,70 @@ O **BlackSync** é um sistema desenvolvido para facilitar a **migração de dado
 - **MySQL**
 - **Git & GitHub**
 
-## ⚙️ Funcionalidades Principais
-✅ **Configuração de Conexões**  
-✅ **Testes de Conectividade**  
-✅ **Suporte a ODBC para Firebird**  
-✅ **Interface Gráfica para Gerenciamento**  
-✅ **Armazenamento de Configuração em `config.ini`**  
-✅ **Verificação e carregamento automático da configuração ao iniciar**  
-✅ **Estrutura Modular para Manutenção**  
+## ⚙️ Funcionalidades
+✅ **Verificação automática de tabelas entre MySQL e Firebird.**
 
-## 🔧 **Instalação e Configuração**
-### 1️⃣ **Clone o Repositório**
+✅ **Opção de selecionar tabelas específicas para migração.**
+
+✅ **Migração otimizada, com verificação de dados duplicados.**
+
+✅ **Registro de logs detalhados para auditoria e análise.**
+
+✅ **Gerador de scripts SQL para ajustes manuais.**
+
+✅ **Interface simplificada e intuitiva.**
+
+## 🔧 Instalação
+
+### 👥 Para Usuários Finais
+
+1️⃣ **Baixe o instalador**
+
+Acesse a página de releases e baixe a versão mais recente do `BlackSync_Setup.exe`.
+
+2️⃣ **Execute o instalador**
+
+Siga as instruções da instalação e selecione os componentes adicionais necessários (como ODBC, Firebird Database, etc.).
+
+3️⃣ **Abra o programa e configure as credenciais**
+
+Após a instalação, configure suas credenciais de acesso ao MySQL e Firebird.
+
+4️⃣ **Pronto!** 🚀
+
+Agora você pode usar o BlackSync para migrar seus dados.
+
+## 🛠️ Para Contribuidores (Desenvolvedores)
+
+Se deseja contribuir com melhorias no BlackSync, siga os passos abaixo para configurar o ambiente de desenvolvimento.
+
+### 1️⃣ Clone o Repositório
 ```sh
 git clone https://github.com/seu-usuario/black-sync.git
 cd black-sync
+```
+
+### 2️⃣ Configure as dependências
+- Certifique-se de ter o .NET 8.0 instalado.
+
+- Instale o Visual Studio 2022 com suporte para Windows Forms.
+
+- Instale os seguintes componentes:
+
+    - Firebird ODBC
+
+    - MySQL ODBC Connector
+
+    - IBExpert (opcional)
+
+### 3️⃣ Compile e execute o projeto Abra o `BlackSync.sln` no Visual Studio e compile o projeto.
+
+### 4️⃣ Sugira melhorias Crie um pull request com suas alterações.
+
+📩 Caso tenha dúvidas ou sugestões, entre em contato!
+
+## 📄 Licença
+Este projeto é de código aberto sob a licença MIT.
+
+
+
