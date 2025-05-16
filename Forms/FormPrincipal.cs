@@ -16,6 +16,7 @@ namespace BlackSync.Forms
     {
         private MySQLService _mySQLService;
         private FirebirdService _firebirdService;
+        private FormConfig _formConfig;
 
         private static readonly string confiFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.ini");
         
@@ -23,7 +24,7 @@ namespace BlackSync.Forms
         {
             InitializeComponent();
 
-            if(VerificarConfiguracao())
+            if (VerificarConfiguracao())
             {
                 AtualizarServicos();
                 CarregarFormularios();
@@ -44,13 +45,13 @@ namespace BlackSync.Forms
                 );
 
                 // 🔹 Garante que o FormConfig seja carregado corretamente
-                FormConfig formConfig = new FormConfig(this);
-                AdicionarFormularioAba(formConfig, tabConfig);
+                _formConfig = new FormConfig(this);
+                AdicionarFormularioAba(_formConfig, tabConfig);
 
                 if (resultado == DialogResult.Yes)
                 {
                     LogService.RegistrarLog("INFO", "🔄 Carregando configuração salva...");
-                    formConfig.CarregarConfiguracao();
+                    _formConfig.CarregarConfiguracao();
                     tabControlPrincipal.SelectedTab = tabMigracao;
                     return true;
                 }
@@ -71,8 +72,8 @@ namespace BlackSync.Forms
                 );
 
                 // 🔹 Agora, carrega o FormConfig para evitar que a tela fique vazia!
-                FormConfig formConfig = new FormConfig(this);
-                AdicionarFormularioAba(formConfig, tabConfig);
+                _formConfig = new FormConfig(this);
+                AdicionarFormularioAba(_formConfig, tabConfig);
 
                 tabControlPrincipal.SelectedTab = tabConfig;
                 return false;
@@ -98,7 +99,10 @@ namespace BlackSync.Forms
             _mySQLService = new MySQLService(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword);
             _firebirdService = new FirebirdService(firebirdDSN);
 
-            AdicionarFormularioAba(new FormConfig(this), tabConfig);
+            if (_formConfig == null)
+                _formConfig = new FormConfig(this);
+            AdicionarFormularioAba(_formConfig, tabConfig);
+            //AdicionarFormularioAba(new FormConfig(this), tabConfig);
             // AdicionarFormularioAba(new FormVerificacao(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabVerificacao);
             // AdicionarFormularioAba(new FormEstrutura(mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabEstrutura);
             AdicionarFormularioAba(new FormMigracao(this, mysqlServer, mysqlDatabase, mysqlUser, mysqlPassword, firebirdDSN), tabMigracao);

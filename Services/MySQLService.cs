@@ -335,6 +335,42 @@ namespace BlackSync.Services
             return codigosExistentes;
         }
 
+        public List<string> ObterColunasAutoIncrementPK(string tabela)
+        {
+            List<string> colunasIgnorar = new List<string>();
+
+            try
+            {
+                using (var conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    string query = $@"
+                        SELECT COLUMN_NAME 
+                        FROM INFORMATION_SCHEMA.COLUMNS 
+                        WHERE TABLE_SCHEMA = '{_banco}' 
+                          AND TABLE_NAME = '{tabela}' 
+                          AND COLUMN_KEY = 'PRI' 
+                          AND EXTRA LIKE '%auto_increment%'";
+
+                    using (var cmd = new MySqlCommand(query, conn))
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            colunasIgnorar.Add(reader.GetString(0).Trim().ToLower());
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogService.RegistrarLog("ERROR", $"❌ Erro ao buscar colunas AUTO_INCREMENT na tabela {tabela}: {ex.Message}");
+            }
+
+            return colunasIgnorar;
+        }
+        
         public void InserirDadosTabela(string tabela, DataTable dados)
         {
             try
@@ -360,11 +396,18 @@ namespace BlackSync.Services
 
                     string tabelaMySQL = tabela.ToLower();
                     var estruturaTabela = ObterEstruturaTabela(tabelaMySQL);
+                    
+                    var colunasIgnorar = ObterColunasAutoIncrementPK(tabelaMySQL);
+                    LogService.RegistrarLog("INFO", $"🔎 Ignorando colunas AUTO_INCREMENT/PK na tabela {tabela}: {string.Join(", ", colunasIgnorar)}");
 
                     var colunasMySQL = estruturaTabela.Select(c => c.Nome.ToLower()).ToList();
                     var colunasFirebird = dados.Columns.Cast<DataColumn>().Select(c => c.ColumnName.ToLower()).ToList();
 
-                    var colunasValidas = colunasFirebird.Intersect(colunasMySQL).ToList();
+                    /*var colunasValidas = colunasFirebird.Intersect(colunasMySQL).ToList()*/;
+                    var colunasValidas = colunasFirebird
+                        .Intersect(colunasMySQL)
+                        .Except(colunasIgnorar)
+                        .ToList();
                     var colunasExtrasMySQL = colunasMySQL.Except(colunasFirebird).ToList();
 
                     if (colunasValidas.Count == 0)
