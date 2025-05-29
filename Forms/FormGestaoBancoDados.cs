@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Data.OleDb;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace BlackSync.Forms
@@ -40,53 +41,7 @@ namespace BlackSync.Forms
         public MySQLService ObterMySQLService() => _mySQLService;
         public FirebirdService ObterFirebirdService() => _firebirdService;
 
-        // Carrega as tabelas do banco de dados do Firebird e MySQL        
-        //private void CarregarTabelas()
-        //{
-        //    LogService.RegistrarLog(
-        //        "INFO",
-        //        $"🔄 Carregando as tabelas dos bancos de dados."
-        //    );
-
-        //    try
-        //    {
-        //        var tabelasFirebird = _firebirdService.GetTabelasFirebird();
-        //        clbTabelasFirebird.Items.Clear();
-
-        //        foreach (var tabela in tabelasFirebird)
-        //            clbTabelasFirebird.Items.Add(tabela, false);
-
-        //        LogService.RegistrarLog(
-        //            "SUCCESS",
-        //            $"✅ Tabelas do banco Firebird carregadas com sucesso."
-        //        );
-
-        //        var tabelasMySQL = _mySQLService.GetTabelasMySQL();
-        //        clbTabelasMySQL.Items.Clear();
-
-        //        foreach (var tabela in tabelasMySQL)
-        //            clbTabelasMySQL.Items.Add(tabela, false);
-
-        //        LogService.RegistrarLog(
-        //            "SUCCESS",
-        //            $"✅ Tabelas do banco MySQL carregadas com sucesso."
-        //        );
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        LogService.RegistrarLog(
-        //            "ERROR",
-        //            $"❌ Erro ao carregar tabelas: {ex.Message}"
-        //        );
-
-        //        MessageBox.Show(
-        //            $"Erro ao carregar tabelas: {ex.Message}",
-        //            "Erro",
-        //            MessageBoxButtons.OK,
-        //            MessageBoxIcon.Error
-        //        );
-        //    }
-        //}
+        // Carrega as tabelas do banco de dados do Firebird e MySQL 
 
         private List<string> ObterTabelasPorCategoria(List<string> categorias)
         {
@@ -1163,9 +1118,182 @@ namespace BlackSync.Forms
             }
         }
 
+        private string caminhoArquivoAccess = null;
+
+        // Ler as tabelas do Access
+        private (DataTable dtEtiqueta, DataTable dtModelos) LerTabelasAccess(string caminhoArquivo)
+        {
+            string connectionString = $"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={caminhoArquivo};";
+
+            DataTable dtEtiqueta = new DataTable();
+            DataTable dtModelos = new DataTable();
+
+            using (var connection = new OleDbConnection(connectionString))
+            {
+                connection.Open();
+
+                string queryEtiqueta = "SELECT * FROM Etiqueta";
+                using (var adapterEtiqueta = new OleDbDataAdapter(queryEtiqueta, connection))
+                {
+                    adapterEtiqueta.Fill(dtEtiqueta);
+                }
+
+                string queryModelos = "SELECT * FROM Modelos";
+                using (var adapterModelos = new OleDbDataAdapter(queryModelos, connection))
+                {
+                    adapterModelos.Fill(dtModelos);
+                }
+            }
+
+            return (dtEtiqueta, dtModelos);
+        }
+
+        private async void btnConverterZpl_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(caminhoArquivoAccess))
+            {
+                MessageBox.Show("Selecione o arquivo Access primeiro.");
+                return;
+            }
+
+            pbGestao.Value = 0;
+            pbGestao.Visible = true;
+            btnConverterZpl.Enabled = false;
+
+            try
+            {
+                LogService.RegistrarLog("INFO", "🔄 Iniciando importação do arquivo Access.");
+
+                var (dtEtiqueta, dtModelos) = await Task.Run(() => LerTabelasAccess(caminhoArquivoAccess));
+
+                LogService.RegistrarLog("INFO", $"📊 Etiqueta: {dtEtiqueta.Rows.Count} registros carregados.");
+                LogService.RegistrarLog("INFO", $"📊 Modelos: {dtModelos.Rows.Count} registros carregados.");
+
+                // Pergunta para o usuário se quer truncar tabela etiqueta_zpl
+                bool truncarEtiqueta = false;
+                bool apenasNovosRegistros = false;
+
+                if (_mySQLService.TabelaTemDados("etiqueta_zpl"))
+                {
+                    var resposta = MessageBox.Show(
+                        "A tabela etiqueta_zpl já contém dados no MySQL.\n\n" +
+                        "Escolha uma opção:\n\n" +
+                        "SIM - Apaga todos os dados antes da inserção\n" +
+                        "NÃO - Insere apenas novos registros\n" +
+                        "CANCELAR - Cancela a importação",
+                        "Dados existentes detectados!",
+                        MessageBoxButtons.YesNoCancel,
+                        MessageBoxIcon.Warning);
+
+                    if (resposta == DialogResult.Yes)
+                    {
+                        truncarEtiqueta = true;
+                        _mySQLService.TruncateTabela("etiqueta_zpl");
+                        LogService.RegistrarLog("SUCCESS", "🚀 Tabela etiqueta_zpl truncada!");
+                    }
+                    else if (resposta == DialogResult.No)
+                    {
+                        apenasNovosRegistros = true;
+                    }
+                    else
+                    {
+                        btnConverterZpl.Enabled = true;
+                        pbGestao.Visible = false;
+                        return;
+                    }
+                }
+
+                DataTable dtEtiquetaParaInserir;
+
+                if (truncarEtiqueta)
+                {
+                    dtEtiquetaParaInserir = dtEtiqueta;
+                }
+                else if (apenasNovosRegistros)
+                {
+                    var existentes = _mySQLService.ObterCodigosExistentes("etiqueta_zpl", "contador");
+                    dtEtiquetaParaInserir = dtEtiqueta.Clone();
+
+                    foreach (DataRow row in dtEtiqueta.Rows)
+                    {
+                        string contador = row["Contador"].ToString();
+                        if (!existentes.Contains(contador))
+                        {
+                            dtEtiquetaParaInserir.ImportRow(row);
+                        }
+                    }
+                }
+                else
+                {
+                    dtEtiquetaParaInserir = dtEtiqueta;
+                }
+
+                // Barra de progresso: somando etiquetas + modelos
+                int totalRegistros = dtEtiquetaParaInserir.Rows.Count + dtModelos.Rows.Count;
+                pbGestao.Maximum = Math.Max(1, totalRegistros);
+                pbGestao.Value = 0;
+
+                // Inserir etiqueta em lote
+                if (dtEtiquetaParaInserir.Rows.Count > 0)
+                {
+                    await Task.Run(() =>
+                    {
+                        _mySQLService.InserirDadosTabela("etiqueta_zpl", dtEtiquetaParaInserir);
+                        Invoke(new Action(() => pbGestao.Value += dtEtiquetaParaInserir.Rows.Count));
+                    });
+
+                    LogService.RegistrarLog("SUCCESS", $"✅ {dtEtiquetaParaInserir.Rows.Count} registros inseridos em etiqueta_zpl.");
+                }
+
+                // Inserir modelos em lote (sem controle de duplicidade, se quiser pode implementar)
+                if (dtModelos.Rows.Count > 0)
+                {
+                    await Task.Run(() =>
+                    {
+                        _mySQLService.InserirDadosTabela("modelos_zpl", dtModelos);
+                        Invoke(new Action(() => pbGestao.Value += dtModelos.Rows.Count));
+                    });
+
+                    LogService.RegistrarLog("SUCCESS", $"✅ {dtModelos.Rows.Count} registros inseridos em modelos_zpl.");
+                }
+
+                MessageBox.Show("Importação concluída com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                LogService.RegistrarLog("ERROR", $"❌ Erro na importação: {ex.Message}");
+                MessageBox.Show($"Erro ao importar dados: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                btnConverterZpl.Enabled = true;
+                pbGestao.Visible = false;
+                pbGestao.Value = 0;
+            }
+        }
+
+        private void btnSelecionarArquivoAccess_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "Arquivo Access (*.mdb)|*.mdb|Todos os arquivos (*.*)|*.*";
+                openFileDialog.Title = "Selecione o arquivo zpl.mdb";
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string caminhoArquivo = openFileDialog.FileName;
+                    caminhoArquivoAccess = openFileDialog.FileName;
+                    txtCaminhoArquivoAccess.Text = caminhoArquivoAccess;
+                }
+            }
+        }
+
+
+
         private void btnExportarBanco_Click(object sender, EventArgs e)
         {
             MessageBox.Show("⚠️ Função ainda não disponível.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
+
     }
 }

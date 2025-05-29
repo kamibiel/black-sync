@@ -217,27 +217,6 @@ namespace BlackSync.Forms
                                 continue;
                             }
 
-                            //if (apenasNovosRegistros)
-                            //{
-                            //    var pkColuna = "CODIGO";
-                            //    var codigosExistentes = _mySQLService.ObterCodigosExistentes(tabela, pkColuna);
-
-                            //    var novosDados = dados.AsEnumerable()
-                            //                          .Where(row => !codigosExistentes.Contains(row[pkColuna].ToString()))
-                            //                          .CopyToDataTable();
-
-                            //    if (novosDados.Rows.Count == 0)
-                            //    {
-                            //        Invoke(new Action(() => txtLog.AppendText($"⚠️ Todos os registros já existem. Nenhum novo dado inserido na tabela {tabela}.{Environment.NewLine}")));
-                            //        continue;
-                            //    }
-
-                            //    dados = novosDados; // Atualiza os dados filtrados
-                            //}
-
-                            // ✅ Nenhum filtro por CODIGO aplicado, pois a PK está sendo ignorada no INSERT.
-                            // Inserção continuará com todos os dados, mesmo que códigos sejam repetidos entre lojas.
-
                             _mySQLService.InserirDadosTabela(tabela, dados);
                             registrosMigrados += dados.Rows.Count;
 

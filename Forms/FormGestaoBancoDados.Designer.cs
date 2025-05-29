@@ -54,6 +54,12 @@
             btnExportarBanco = new Button();
             lbDivisor1 = new Label();
             pbGestao = new ProgressBar();
+            lbDivisor2 = new Label();
+            gbMigracaoZpl = new GroupBox();
+            btnSelecionar = new Button();
+            txtCaminhoArquivoAccess = new TextBox();
+            btnConverterZpl = new Button();
+            btnSelecionarArquivoAccess = new OpenFileDialog();
             gpPeriodo.SuspendLayout();
             gpBanco.SuspendLayout();
             gbDados.SuspendLayout();
@@ -61,6 +67,7 @@
             ((System.ComponentModel.ISupportInitialize)nEmpresaN).BeginInit();
             ((System.ComponentModel.ISupportInitialize)nFilial).BeginInit();
             ((System.ComponentModel.ISupportInitialize)nEmpresa).BeginInit();
+            gbMigracaoZpl.SuspendLayout();
             SuspendLayout();
             // 
             // gpPeriodo
@@ -320,12 +327,13 @@
             // 
             btnExportarBanco.FlatStyle = FlatStyle.Flat;
             btnExportarBanco.Font = new Font("Arial", 9.75F);
-            btnExportarBanco.Location = new Point(172, 215);
+            btnExportarBanco.Location = new Point(174, 335);
             btnExportarBanco.Name = "btnExportarBanco";
             btnExportarBanco.Size = new Size(208, 27);
             btnExportarBanco.TabIndex = 20;
             btnExportarBanco.Text = "Exportar Banco";
             btnExportarBanco.UseVisualStyleBackColor = true;
+            btnExportarBanco.Visible = false;
             btnExportarBanco.Click += btnExportarBanco_Click;
             // 
             // lbDivisor1
@@ -341,17 +349,79 @@
             // 
             // pbGestao
             // 
-            pbGestao.Location = new Point(24, 198);
+            pbGestao.Location = new Point(22, 318);
             pbGestao.Name = "pbGestao";
             pbGestao.Size = new Size(543, 11);
             pbGestao.TabIndex = 21;
+            // 
+            // lbDivisor2
+            // 
+            lbDivisor2.BackColor = Color.Black;
+            lbDivisor2.BorderStyle = BorderStyle.Fixed3D;
+            lbDivisor2.ForeColor = Color.Black;
+            lbDivisor2.Location = new Point(22, 313);
+            lbDivisor2.MaximumSize = new Size(0, 2);
+            lbDivisor2.Name = "lbDivisor2";
+            lbDivisor2.Size = new Size(543, 2);
+            lbDivisor2.TabIndex = 22;
+            // 
+            // gbMigracaoZpl
+            // 
+            gbMigracaoZpl.Controls.Add(btnSelecionar);
+            gbMigracaoZpl.Controls.Add(txtCaminhoArquivoAccess);
+            gbMigracaoZpl.Controls.Add(btnConverterZpl);
+            gbMigracaoZpl.Font = new Font("Arial", 12F, FontStyle.Bold);
+            gbMigracaoZpl.Location = new Point(37, 206);
+            gbMigracaoZpl.Name = "gbMigracaoZpl";
+            gbMigracaoZpl.Size = new Size(241, 91);
+            gbMigracaoZpl.TabIndex = 23;
+            gbMigracaoZpl.TabStop = false;
+            gbMigracaoZpl.Text = "Migração ZPL";
+            // 
+            // btnSelecionar
+            // 
+            btnSelecionar.FlatStyle = FlatStyle.Flat;
+            btnSelecionar.Font = new Font("Arial", 9.75F);
+            btnSelecionar.Location = new Point(15, 57);
+            btnSelecionar.Name = "btnSelecionar";
+            btnSelecionar.Size = new Size(101, 27);
+            btnSelecionar.TabIndex = 26;
+            btnSelecionar.Text = "Selecionar";
+            btnSelecionar.UseVisualStyleBackColor = true;
+            btnSelecionar.Click += btnSelecionarArquivoAccess_Click;
+            // 
+            // txtCaminhoArquivoAccess
+            // 
+            txtCaminhoArquivoAccess.Font = new Font("Arial", 9F);
+            txtCaminhoArquivoAccess.Location = new Point(6, 25);
+            txtCaminhoArquivoAccess.Name = "txtCaminhoArquivoAccess";
+            txtCaminhoArquivoAccess.Size = new Size(229, 21);
+            txtCaminhoArquivoAccess.TabIndex = 25;
+            // 
+            // btnConverterZpl
+            // 
+            btnConverterZpl.FlatStyle = FlatStyle.Flat;
+            btnConverterZpl.Font = new Font("Arial", 9.75F);
+            btnConverterZpl.Location = new Point(122, 57);
+            btnConverterZpl.Name = "btnConverterZpl";
+            btnConverterZpl.Size = new Size(101, 27);
+            btnConverterZpl.TabIndex = 24;
+            btnConverterZpl.Text = "Converter";
+            btnConverterZpl.UseVisualStyleBackColor = true;
+            btnConverterZpl.Click += btnConverterZpl_Click;
+            // 
+            // btnSelecionarArquivoAccess
+            // 
+            btnSelecionarArquivoAccess.FileName = "btnSelecionarArquivoAccess";
             // 
             // FormGestaoBancoDados
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.DimGray;
-            ClientSize = new Size(584, 254);
+            ClientSize = new Size(594, 376);
+            Controls.Add(gbMigracaoZpl);
+            Controls.Add(lbDivisor2);
             Controls.Add(pbGestao);
             Controls.Add(lbDivisor1);
             Controls.Add(btnExportarBanco);
@@ -377,6 +447,8 @@
             ((System.ComponentModel.ISupportInitialize)nEmpresaN).EndInit();
             ((System.ComponentModel.ISupportInitialize)nFilial).EndInit();
             ((System.ComponentModel.ISupportInitialize)nEmpresa).EndInit();
+            gbMigracaoZpl.ResumeLayout(false);
+            gbMigracaoZpl.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -408,5 +480,11 @@
         private ProgressBar pbGestao;
         private NumericUpDown nEmpresaN;
         private Label label1;
+        private Label lbDivisor2;
+        private GroupBox gbMigracaoZpl;
+        private Button btnConverterZpl;
+        private OpenFileDialog btnSelecionarArquivoAccess;
+        private TextBox txtCaminhoArquivoAccess;
+        private Button btnSelecionar;
     }
 }
