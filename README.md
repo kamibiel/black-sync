@@ -73,8 +73,20 @@ cd black-sync
 
 📩 Caso tenha dúvidas ou sugestões, entre em contato!
 
+## 📦 Nova Versão Disponível (v2.0.0 - Avalonia)
+
+🚨 **O BlackSync agora possui uma nova versão com interface moderna e multiplataforma!**
+
+A versão **2.0.0** foi desenvolvida com **Avalonia UI**, permitindo suporte a múltiplos sistemas operacionais (Windows, Linux e macOS), melhorias de usabilidade e novas funcionalidades.
+
+🔗 [Clique aqui para acessar o novo repositório do BlackSync v2.0.0](https://github.com/kamibiel/blacksync-v2)
+
+Recomendamos que novos projetos utilizem a nova versão. Esta versão WinForms (1.2.0) continuará disponível como legado.
+
 ## 📄 Licença
 Este projeto é de código aberto sob a licença MIT.
+
+
 
 
 
